@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DCO CMS — Renewal Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .badge-red    { background: var(--red-bg);    color: var(--red-text);    border: 1px solid var(--red-text);    padding: 2px 7px; font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+    .badge-orange { background: var(--orange-bg); color: var(--orange-text); border: 1px solid var(--orange-text); padding: 2px 7px; font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+    .badge-yellow { background: var(--yellow-bg); color: var(--yellow-text); border: 1px solid var(--yellow-text); padding: 2px 7px; font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+    .badge-green  { background: var(--green-bg);  color: var(--green-text);  border: 1px solid var(--green-text);  padding: 2px 7px; font-size: 10px; font-weight: 700; letter-spacing: .06em; }
+
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px; margin-bottom: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+  </style>
+</head>
+<body>
+
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner-lg"></div>
+    <span>Loading...</span>
+  </div>
+
+  <!-- Nav -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <span class="star">&#9733;</span> DCO CMS
+    </div>
+    <div class="navbar-center">RENEWAL TRACKER</div>
+    <div class="navbar-right">
+      <a href="dashboard.html" class="btn btn-outline btn-sm">CONTRACT DASHBOARD</a>
+      <span id="navUsername" class="text-muted" style="font-size:12px"></span>
+      <span id="navRoleBadge" class="user-badge"></span>
+      <button id="logoutBtn" class="btn btn-outline btn-sm">LOGOUT</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <div class="alert" id="pageAlert"></div>
+
+    <!-- Warning banner -->
+    <div class="renewal-banner">
+      <strong>ALL CONTRACT RENEWALS REQUIRE A MINIMUM 45-DAY LEAD TIME</strong>
+      This lead time is required to complete the following sequential actions:
+      (1) Market Analysis &nbsp;&#8594;&nbsp;
+      (2) Request for Quote (RFQ) &nbsp;&#8594;&nbsp;
+      (3) Vendor Q&amp;A / Customer Feedback &nbsp;&#8594;&nbsp;
+      (4) Submission to Contracting Officer (KO) for Execution.
+      Failure to initiate on time risks a lapse in contract coverage.
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <span style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.07em;align-self:center">Status:</span>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red-text)"></div><span class="text-muted">Suspense overdue</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange-text)"></div><span class="text-muted">0–14 days until suspense (Critical)</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--yellow-text)"></div><span class="text-muted">15–30 days until suspense (Warning)</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green-text)"></div><span class="text-muted">&gt;30 days until suspense (Monitor)</span></div>
+    </div>
+
+    <div class="page-header">
+      <div class="page-title">
+        Upcoming Renewals
+        <span id="renewalCount" class="text-muted" style="font-size:11px;font-weight:400;letter-spacing:0;margin-left:8px"></span>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="hidden" id="renewalEmpty" style="padding:40px;text-align:center;color:var(--text-muted);border:1px solid var(--border)">
+      No contracts require renewal action within the next 120 days.
+    </div>
+
+    <!-- Renewal table -->
+    <div class="table-wrapper" id="renewalTable">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px">#</th>
+            <th title="Name of the delivery order">Delivery Order Name</th>
+            <th title="Official delivery order number">DO #</th>
+            <th title="Period of Performance end date">PoP End Date</th>
+            <th title="Calendar days remaining until PoP ends">Days Until Expiry</th>
+            <th title="Deadline to initiate renewal action (PoP End minus 45 days)">Suspense Date</th>
+            <th title="Calendar days until the suspense deadline">Days Until Suspense</th>
+            <th title="Associated Program(s) of Record">POR(s)</th>
+            <th title="Urgency status based on suspense deadline">Status</th>
+            <th style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody id="renewalTbody"></tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <div class="page-footer">UNCLASSIFIED // FOR OFFICIAL USE ONLY &nbsp;|&nbsp; DCO Contract Management System &nbsp;|&nbsp; ARCYBER</div>
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <!-- Detail modal (shared logic via DETAIL object from dashboard.js) -->
+  <div class="modal-overlay" id="detailOverlay">
+    <div class="modal" style="max-width:800px">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="detailTitle"></div>
+          <div class="modal-subtitle" id="detailSubtitle"></div>
+        </div>
+        <button class="modal-close" onclick="DETAIL.close()">&#10005;</button>
+      </div>
+      <div class="modal-body" style="max-height:75vh;overflow-y:auto">
+        <div class="modal-section" id="detailVendorSection">
+          <div class="modal-section-title">Vendor Information</div>
+          <div id="detailVendorBody"></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Contract Details</div>
+          <div id="detailInfoBody"></div>
+        </div>
+        <div class="modal-section" id="detailCostSection">
+          <div class="modal-section-title">Cost Breakdown &amp; Summary</div>
+          <div id="detailCostBody"></div>
+        </div>
+        <div class="modal-section" id="detailDocsSection">
+          <div class="modal-section-title">Contract Documents</div>
+          <div id="detailDocsBody"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="DETAIL.close()">CLOSE</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/github-api.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/renewal.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      RENEWAL.init();
+    });
+  </script>
+</body>
+</html>

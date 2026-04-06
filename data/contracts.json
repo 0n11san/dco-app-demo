@@ -1,0 +1,609 @@
+[
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567001",
+    "deliveryOrderName": "CrowdStrike Falcon (EDR)",
+    "deliveryOrderNumber": "W31P4Q-25-F-0101",
+    "vendorPOCs": [
+      { "name": "Marcus Webb", "email": "m.webb@crowdstrike.com", "phone": "571-555-0101" },
+      { "name": "Tasha Brennan", "email": "t.brennan@crowdstrike.com", "phone": "571-555-0102" }
+    ],
+    "costs": {
+      "ba8Portion": 285000,
+      "arcyberPortion": 95000,
+      "itemsFee": 3800,
+      "gsaFee": 7600,
+      "totalCurrentCost": 391400,
+      "projectedNextFY": 410000
+    },
+    "por": ["DDS"],
+    "popBeginDate": "2025-04-15",
+    "popEndDate": "2026-04-20",
+    "lineItems": [
+      { "description": "Falcon Complete - 500 Endpoints", "quantity": 500, "unitCost": 480, "total": 240000 },
+      { "description": "Falcon Intelligence Subscription", "quantity": 1, "unitCost": 85000, "total": 85000 },
+      { "description": "CrowdStrike University Training (5 seats)", "quantity": 5, "unitCost": 11000, "total": 55000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Critical EDR platform for endpoint visibility. Renewal requires ATO re-validation."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567002",
+    "deliveryOrderName": "RedSeal Network Security Management",
+    "deliveryOrderNumber": "W31P4Q-25-F-0102",
+    "vendorPOCs": [
+      { "name": "Patricia Holt", "email": "p.holt@redseal.net", "phone": "571-555-0201" }
+    ],
+    "costs": {
+      "ba8Portion": 145000,
+      "arcyberPortion": 55000,
+      "itemsFee": 2000,
+      "gsaFee": 4000,
+      "totalCurrentCost": 206000,
+      "projectedNextFY": 215000
+    },
+    "por": ["GDP"],
+    "popBeginDate": "2025-04-30",
+    "popEndDate": "2026-05-05",
+    "lineItems": [
+      { "description": "RedSeal Platform License - Enterprise", "quantity": 1, "unitCost": 130000, "total": 130000 },
+      { "description": "Premium Support & Maintenance", "quantity": 1, "unitCost": 70000, "total": 70000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Network topology and attack path analysis. Core GDP capability."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567003",
+    "deliveryOrderName": "ITPIE IT Portfolio Management",
+    "deliveryOrderNumber": "W31P4Q-25-F-0103",
+    "vendorPOCs": [
+      { "name": "Gregory Simmons", "email": "g.simmons@itpie.io", "phone": "571-555-0301" }
+    ],
+    "costs": {
+      "ba8Portion": 78000,
+      "arcyberPortion": 42000,
+      "itemsFee": 1200,
+      "gsaFee": 2400,
+      "totalCurrentCost": 123600,
+      "projectedNextFY": 130000
+    },
+    "por": ["F&MA"],
+    "popBeginDate": "2025-05-01",
+    "popEndDate": "2026-05-10",
+    "lineItems": [
+      { "description": "ITPIE Platform SaaS License", "quantity": 1, "unitCost": 95000, "total": 95000 },
+      { "description": "Data Integration & Onboarding", "quantity": 1, "unitCost": 25000, "total": 25000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "IT asset portfolio tracking across ARCYBER components."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567004",
+    "deliveryOrderName": "Gigamon Network Visibility",
+    "deliveryOrderNumber": "W31P4Q-25-F-0104",
+    "vendorPOCs": [
+      { "name": "Sandra Nguyen", "email": "s.nguyen@gigamon.com", "phone": "571-555-0401" }
+    ],
+    "costs": {
+      "ba8Portion": 210000,
+      "arcyberPortion": 90000,
+      "itemsFee": 3000,
+      "gsaFee": 6000,
+      "totalCurrentCost": 309000,
+      "projectedNextFY": 325000
+    },
+    "por": ["GDP", "DDS"],
+    "popBeginDate": "2025-05-05",
+    "popEndDate": "2026-05-15",
+    "lineItems": [
+      { "description": "GigaVUE-HC3 Chassis & Modules", "quantity": 2, "unitCost": 95000, "total": 190000 },
+      { "description": "GigaSMART Licenses & Support", "quantity": 1, "unitCost": 110000, "total": 110000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Inline network traffic visibility and packet broker capabilities."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567005",
+    "deliveryOrderName": "Elastic SIEM / Log Management",
+    "deliveryOrderNumber": "W31P4Q-25-F-0105",
+    "vendorPOCs": [
+      { "name": "Derek Fontaine", "email": "d.fontaine@elastic.co", "phone": "571-555-0501" },
+      { "name": "Kim Torres", "email": "k.torres@elastic.co", "phone": "571-555-0502" }
+    ],
+    "costs": {
+      "ba8Portion": 320000,
+      "arcyberPortion": 80000,
+      "itemsFee": 4000,
+      "gsaFee": 8000,
+      "totalCurrentCost": 412000,
+      "projectedNextFY": 435000
+    },
+    "por": ["DDS"],
+    "popBeginDate": "2025-05-20",
+    "popEndDate": "2026-06-15",
+    "lineItems": [
+      { "description": "Elastic Enterprise License - 200GB/day", "quantity": 1, "unitCost": 220000, "total": 220000 },
+      { "description": "Elastic Managed SIEM Service", "quantity": 1, "unitCost": 130000, "total": 130000 },
+      { "description": "Platinum Support Subscription", "quantity": 1, "unitCost": 50000, "total": 50000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Primary SIEM platform. Ingestion volume must be reviewed at renewal."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567006",
+    "deliveryOrderName": "Greeley Professional Services Support",
+    "deliveryOrderNumber": "W31P4Q-25-F-0106",
+    "vendorPOCs": [
+      { "name": "Anthony Reese", "email": "a.reese@greeleysolutions.com", "phone": "571-555-0601" }
+    ],
+    "costs": {
+      "ba8Portion": 55000,
+      "arcyberPortion": 45000,
+      "itemsFee": 1000,
+      "gsaFee": 2000,
+      "totalCurrentCost": 103000,
+      "projectedNextFY": 108000
+    },
+    "por": ["Miscellaneous"],
+    "popBeginDate": "2025-06-01",
+    "popEndDate": "2026-06-30",
+    "lineItems": [
+      { "description": "Technical Advisory Support (640 hours)", "quantity": 640, "unitCost": 95, "total": 60800 },
+      { "description": "Program Management Support", "quantity": 1, "unitCost": 39200, "total": 39200 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "General professional services support for DCO program office."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567007",
+    "deliveryOrderName": "Cellebrite Digital Forensics",
+    "deliveryOrderNumber": "W31P4Q-25-F-0107",
+    "vendorPOCs": [
+      { "name": "Rachel Kim", "email": "r.kim@cellebrite.com", "phone": "571-555-0701" }
+    ],
+    "costs": {
+      "ba8Portion": 88000,
+      "arcyberPortion": 32000,
+      "itemsFee": 1200,
+      "gsaFee": 2400,
+      "totalCurrentCost": 123600,
+      "projectedNextFY": 130000
+    },
+    "por": ["GDP"],
+    "popBeginDate": "2025-06-15",
+    "popEndDate": "2026-07-10",
+    "lineItems": [
+      { "description": "UFED Ultimate License (5 seats)", "quantity": 5, "unitCost": 12000, "total": 60000 },
+      { "description": "Cellebrite Analytics Platform", "quantity": 1, "unitCost": 38000, "total": 38000 },
+      { "description": "Annual Maintenance & Software Updates", "quantity": 1, "unitCost": 22000, "total": 22000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Mobile device forensics and digital investigation capability."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567008",
+    "deliveryOrderName": "Proofpoint Email Security",
+    "deliveryOrderNumber": "W31P4Q-25-F-0108",
+    "vendorPOCs": [
+      { "name": "James Archer", "email": "j.archer@proofpoint.com", "phone": "571-555-0801" }
+    ],
+    "costs": {
+      "ba8Portion": 112000,
+      "arcyberPortion": 38000,
+      "itemsFee": 1500,
+      "gsaFee": 3000,
+      "totalCurrentCost": 154500,
+      "projectedNextFY": 162000
+    },
+    "por": ["DDS"],
+    "popBeginDate": "2025-07-01",
+    "popEndDate": "2026-07-25",
+    "lineItems": [
+      { "description": "Proofpoint TAP Advanced Threat Protection", "quantity": 1, "unitCost": 95000, "total": 95000 },
+      { "description": "Email Fraud Defense & DMARC", "quantity": 1, "unitCost": 55000, "total": 55000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Email gateway and phishing protection. Covers all ARCYBER mail-enabled accounts."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567009",
+    "deliveryOrderName": "Red Hat Enterprise Linux / Middleware",
+    "deliveryOrderNumber": "W31P4Q-25-F-0109",
+    "vendorPOCs": [
+      { "name": "Maria Castillo", "email": "m.castillo@redhat.com", "phone": "571-555-0901" },
+      { "name": "Brian Kowalski", "email": "b.kowalski@redhat.com", "phone": "571-555-0902" }
+    ],
+    "costs": {
+      "ba8Portion": 165000,
+      "arcyberPortion": 35000,
+      "itemsFee": 2000,
+      "gsaFee": 4000,
+      "totalCurrentCost": 206000,
+      "projectedNextFY": 215000
+    },
+    "por": ["F&MA"],
+    "popBeginDate": "2025-08-01",
+    "popEndDate": "2026-08-31",
+    "lineItems": [
+      { "description": "RHEL Server Subscription - Premium (100 systems)", "quantity": 100, "unitCost": 1200, "total": 120000 },
+      { "description": "OpenShift Platform Plus (16 cores)", "quantity": 16, "unitCost": 3500, "total": 56000 },
+      { "description": "Red Hat Ansible Automation Platform", "quantity": 1, "unitCost": 24000, "total": 24000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Base OS and middleware infrastructure licensing."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567010",
+    "deliveryOrderName": "Celebrite Digital Forensics Suite",
+    "deliveryOrderNumber": "W31P4Q-25-F-0110",
+    "vendorPOCs": [
+      { "name": "Nicole Farmer", "email": "n.farmer@celebrite-df.com", "phone": "571-555-1001" }
+    ],
+    "costs": {
+      "ba8Portion": 62000,
+      "arcyberPortion": 18000,
+      "itemsFee": 800,
+      "gsaFee": 1600,
+      "totalCurrentCost": 82400,
+      "projectedNextFY": 86000
+    },
+    "por": ["GDP"],
+    "popBeginDate": "2025-09-01",
+    "popEndDate": "2026-09-15",
+    "lineItems": [
+      { "description": "Celebrite Forensic Platform License", "quantity": 3, "unitCost": 15000, "total": 45000 },
+      { "description": "Annual Support & Training Package", "quantity": 1, "unitCost": 35000, "total": 35000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Complementary forensics suite. Coordinate renewal with Cellebrite contract."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567011",
+    "deliveryOrderName": "Oxygen Forensics Detective",
+    "deliveryOrderNumber": "W31P4Q-25-F-0111",
+    "vendorPOCs": [
+      { "name": "David Pearce", "email": "d.pearce@oxygen-forensic.com", "phone": "571-555-1101" }
+    ],
+    "costs": {
+      "ba8Portion": 48000,
+      "arcyberPortion": 12000,
+      "itemsFee": 600,
+      "gsaFee": 1200,
+      "totalCurrentCost": 61800,
+      "projectedNextFY": 65000
+    },
+    "por": ["GDP"],
+    "popBeginDate": "2025-09-15",
+    "popEndDate": "2026-09-30",
+    "lineItems": [
+      { "description": "Oxygen Detective Enterprise (4 licenses)", "quantity": 4, "unitCost": 8500, "total": 34000 },
+      { "description": "Cloud Module & Maintenance", "quantity": 1, "unitCost": 26000, "total": 26000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Mobile and cloud data acquisition for digital forensics operations."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567012",
+    "deliveryOrderName": "Ubuntu Pro (Canonical)",
+    "deliveryOrderNumber": "W31P4Q-25-F-0112",
+    "vendorPOCs": [
+      { "name": "Helen Marsh", "email": "h.marsh@canonical.com", "phone": "571-555-1201" }
+    ],
+    "costs": {
+      "ba8Portion": 38000,
+      "arcyberPortion": 12000,
+      "itemsFee": 500,
+      "gsaFee": 1000,
+      "totalCurrentCost": 51500,
+      "projectedNextFY": 54000
+    },
+    "por": ["F&MA"],
+    "popBeginDate": "2025-10-01",
+    "popEndDate": "2026-10-15",
+    "lineItems": [
+      { "description": "Ubuntu Pro Desktop (50 workstations)", "quantity": 50, "unitCost": 500, "total": 25000 },
+      { "description": "Ubuntu Pro Server + ESM (25 servers)", "quantity": 25, "unitCost": 1000, "total": 25000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Extended security maintenance for Ubuntu Linux deployments."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567013",
+    "deliveryOrderName": "VMware vSphere Virtualization",
+    "deliveryOrderNumber": "W31P4Q-25-F-0113",
+    "vendorPOCs": [
+      { "name": "Robert Yates", "email": "r.yates@broadcom.com", "phone": "571-555-1301" },
+      { "name": "Stephanie Banks", "email": "s.banks@broadcom.com", "phone": "571-555-1302" }
+    ],
+    "costs": {
+      "ba8Portion": 245000,
+      "arcyberPortion": 55000,
+      "itemsFee": 3000,
+      "gsaFee": 6000,
+      "totalCurrentCost": 309000,
+      "projectedNextFY": 340000
+    },
+    "por": ["F&MA", "GDP"],
+    "popBeginDate": "2025-10-15",
+    "popEndDate": "2026-10-31",
+    "lineItems": [
+      { "description": "vSphere Enterprise Plus (96 cores)", "quantity": 96, "unitCost": 1650, "total": 158400 },
+      { "description": "vSAN Enterprise License (4 nodes)", "quantity": 4, "unitCost": 16000, "total": 64000 },
+      { "description": "vCenter Server Standard + SNS", "quantity": 1, "unitCost": 77600, "total": 77600 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Core virtualization infrastructure. Post-Broadcom acquisition pricing review required."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567014",
+    "deliveryOrderName": "Netscout Network Monitoring",
+    "deliveryOrderNumber": "W31P4Q-25-F-0114",
+    "vendorPOCs": [
+      { "name": "Carl Jennings", "email": "c.jennings@netscout.com", "phone": "571-555-1401" }
+    ],
+    "costs": {
+      "ba8Portion": 95000,
+      "arcyberPortion": 25000,
+      "itemsFee": 1200,
+      "gsaFee": 2400,
+      "totalCurrentCost": 123600,
+      "projectedNextFY": 130000
+    },
+    "por": ["GDP"],
+    "popBeginDate": "2025-11-01",
+    "popEndDate": "2026-11-15",
+    "lineItems": [
+      { "description": "nGeniusONE Server Software", "quantity": 1, "unitCost": 65000, "total": 65000 },
+      { "description": "InfiniStream Appliance Maintenance", "quantity": 2, "unitCost": 27500, "total": 55000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Passive network performance monitoring and packet analysis."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567015",
+    "deliveryOrderName": "Dragos ICS/OT Security Platform",
+    "deliveryOrderNumber": "W31P4Q-25-F-0115",
+    "vendorPOCs": [
+      { "name": "Veronica Shields", "email": "v.shields@dragos.com", "phone": "571-555-1501" }
+    ],
+    "costs": {
+      "ba8Portion": 175000,
+      "arcyberPortion": 75000,
+      "itemsFee": 2500,
+      "gsaFee": 5000,
+      "totalCurrentCost": 257500,
+      "projectedNextFY": 272000
+    },
+    "por": ["DDS"],
+    "popBeginDate": "2025-11-15",
+    "popEndDate": "2026-11-30",
+    "lineItems": [
+      { "description": "Dragos Platform ICS License - Enterprise", "quantity": 1, "unitCost": 180000, "total": 180000 },
+      { "description": "WorldView Threat Intelligence", "quantity": 1, "unitCost": 70000, "total": 70000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "OT/ICS threat detection and industrial asset visibility."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567016",
+    "deliveryOrderName": "GitLab DevSecOps Platform",
+    "deliveryOrderNumber": "W31P4Q-25-F-0116",
+    "vendorPOCs": [
+      { "name": "Philip Dawson", "email": "p.dawson@gitlab.com", "phone": "571-555-1601" }
+    ],
+    "costs": {
+      "ba8Portion": 68000,
+      "arcyberPortion": 32000,
+      "itemsFee": 1000,
+      "gsaFee": 2000,
+      "totalCurrentCost": 103000,
+      "projectedNextFY": 108000
+    },
+    "por": ["DDS", "F&MA"],
+    "popBeginDate": "2025-12-01",
+    "popEndDate": "2026-12-15",
+    "lineItems": [
+      { "description": "GitLab Ultimate - Self-Managed (100 users)", "quantity": 100, "unitCost": 750, "total": 75000 },
+      { "description": "Premium Support & Professional Services", "quantity": 1, "unitCost": 25000, "total": 25000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Source code management, CI/CD, and SAST/DAST scanning pipeline."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567017",
+    "deliveryOrderName": "IDA Pro Reverse Engineering Tool",
+    "deliveryOrderNumber": "W31P4Q-25-F-0117",
+    "vendorPOCs": [
+      { "name": "Laura Hendrix", "email": "l.hendrix@hexrays.com", "phone": "571-555-1701" }
+    ],
+    "costs": {
+      "ba8Portion": 52000,
+      "arcyberPortion": 18000,
+      "itemsFee": 700,
+      "gsaFee": 1400,
+      "totalCurrentCost": 72100,
+      "projectedNextFY": 76000
+    },
+    "por": ["GDP"],
+    "popBeginDate": "2026-01-01",
+    "popEndDate": "2026-12-31",
+    "lineItems": [
+      { "description": "IDA Pro Named License (5 seats)", "quantity": 5, "unitCost": 12000, "total": 60000 },
+      { "description": "Hex-Rays Decompiler (ARM/x86/x64)", "quantity": 1, "unitCost": 10000, "total": 10000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Primary static analysis and reverse engineering tool for malware analysis."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567018",
+    "deliveryOrderName": "Jira Software (Atlassian) Project Management",
+    "deliveryOrderNumber": "W31P4Q-25-F-0118",
+    "vendorPOCs": [
+      { "name": "Thomas Wu", "email": "t.wu@atlassian.com", "phone": "571-555-1801" }
+    ],
+    "costs": {
+      "ba8Portion": 28000,
+      "arcyberPortion": 12000,
+      "itemsFee": 400,
+      "gsaFee": 800,
+      "totalCurrentCost": 41200,
+      "projectedNextFY": 43500
+    },
+    "por": ["F&MA", "Miscellaneous"],
+    "popBeginDate": "2026-01-15",
+    "popEndDate": "2027-01-14",
+    "lineItems": [
+      { "description": "Jira Software Data Center - 100 users", "quantity": 100, "unitCost": 280, "total": 28000 },
+      { "description": "Confluence Data Center - 100 users", "quantity": 100, "unitCost": 120, "total": 12000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Program management and knowledge management platform."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567019",
+    "deliveryOrderName": "Shodan OSINT / Attack Surface Monitoring",
+    "deliveryOrderNumber": "W31P4Q-25-F-0119",
+    "vendorPOCs": [
+      { "name": "Elena Vasquez", "email": "e.vasquez@shodan.io", "phone": "571-555-1901" }
+    ],
+    "costs": {
+      "ba8Portion": 14000,
+      "arcyberPortion": 6000,
+      "itemsFee": 200,
+      "gsaFee": 400,
+      "totalCurrentCost": 20600,
+      "projectedNextFY": 22000
+    },
+    "por": ["GDP"],
+    "popBeginDate": "2026-02-01",
+    "popEndDate": "2027-01-31",
+    "lineItems": [
+      { "description": "Shodan Enterprise API Subscription", "quantity": 1, "unitCost": 20000, "total": 20000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Internet-facing asset discovery and exposure monitoring."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567020",
+    "deliveryOrderName": "Fortify Application Security (OpenText)",
+    "deliveryOrderNumber": "W31P4Q-25-F-0120",
+    "vendorPOCs": [
+      { "name": "Steven Caldwell", "email": "s.caldwell@opentext.com", "phone": "571-555-2001" }
+    ],
+    "costs": {
+      "ba8Portion": 88000,
+      "arcyberPortion": 32000,
+      "itemsFee": 1200,
+      "gsaFee": 2400,
+      "totalCurrentCost": 123600,
+      "projectedNextFY": 130000
+    },
+    "por": ["DDS"],
+    "popBeginDate": "2026-02-15",
+    "popEndDate": "2027-02-14",
+    "lineItems": [
+      { "description": "Fortify SCA Static Code Analysis (10 apps)", "quantity": 10, "unitCost": 7000, "total": 70000 },
+      { "description": "WebInspect DAST License (5 seats)", "quantity": 5, "unitCost": 10000, "total": 50000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "SAST/DAST application security testing for software development pipelines."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567021",
+    "deliveryOrderName": "JFrog Artifactory (Artifact Management)",
+    "deliveryOrderNumber": "W31P4Q-25-F-0121",
+    "vendorPOCs": [
+      { "name": "Christine Lambert", "email": "c.lambert@jfrog.com", "phone": "571-555-2101" }
+    ],
+    "costs": {
+      "ba8Portion": 42000,
+      "arcyberPortion": 18000,
+      "itemsFee": 600,
+      "gsaFee": 1200,
+      "totalCurrentCost": 61800,
+      "projectedNextFY": 65000
+    },
+    "por": ["DDS", "F&MA"],
+    "popBeginDate": "2026-03-01",
+    "popEndDate": "2027-02-28",
+    "lineItems": [
+      { "description": "JFrog Artifactory Enterprise+ License", "quantity": 1, "unitCost": 42000, "total": 42000 },
+      { "description": "Xray Security Scanning Add-on", "quantity": 1, "unitCost": 18000, "total": 18000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Binary artifact management and vulnerability scanning for CI/CD pipelines."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567022",
+    "deliveryOrderName": "Security Onion Network Security Monitoring",
+    "deliveryOrderNumber": "W31P4Q-25-F-0122",
+    "vendorPOCs": [
+      { "name": "Marcus Fields", "email": "m.fields@securityonionsolutions.com", "phone": "571-555-2201" }
+    ],
+    "costs": {
+      "ba8Portion": 35000,
+      "arcyberPortion": 15000,
+      "itemsFee": 500,
+      "gsaFee": 1000,
+      "totalCurrentCost": 51500,
+      "projectedNextFY": 54000
+    },
+    "por": ["GDP", "DDS"],
+    "popBeginDate": "2026-03-15",
+    "popEndDate": "2027-03-14",
+    "lineItems": [
+      { "description": "Security Onion Pro License & Support", "quantity": 1, "unitCost": 28000, "total": 28000 },
+      { "description": "Professional Deployment & Training", "quantity": 1, "unitCost": 22000, "total": 22000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "Open-source-based NSM platform with enterprise support tier."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567023",
+    "deliveryOrderName": "JA4+ Network Fingerprinting (FoxIO)",
+    "deliveryOrderNumber": "W31P4Q-25-F-0123",
+    "vendorPOCs": [
+      { "name": "Ian Fox", "email": "i.fox@foxio.io", "phone": "571-555-2301" }
+    ],
+    "costs": {
+      "ba8Portion": 18000,
+      "arcyberPortion": 7000,
+      "itemsFee": 250,
+      "gsaFee": 500,
+      "totalCurrentCost": 25750,
+      "projectedNextFY": 27000
+    },
+    "por": ["GDP"],
+    "popBeginDate": "2026-04-01",
+    "popEndDate": "2027-03-31",
+    "lineItems": [
+      { "description": "JA4+ Enterprise License & Threat Feed", "quantity": 1, "unitCost": 25000, "total": 25000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "TLS/QUIC client fingerprinting for threat hunting and detection."
+  },
+  {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567024",
+    "deliveryOrderName": "Blancco Data Erasure Platform",
+    "deliveryOrderNumber": "W31P4Q-25-F-0124",
+    "vendorPOCs": [
+      { "name": "Sarah Mitchell", "email": "s.mitchell@blancco.com", "phone": "571-555-2401" }
+    ],
+    "costs": {
+      "ba8Portion": 22000,
+      "arcyberPortion": 8000,
+      "itemsFee": 300,
+      "gsaFee": 600,
+      "totalCurrentCost": 30900,
+      "projectedNextFY": 32500
+    },
+    "por": ["GDP", "Miscellaneous"],
+    "popBeginDate": "2026-04-01",
+    "popEndDate": "2027-03-31",
+    "lineItems": [
+      { "description": "Blancco Drive Eraser - 200 erasure credits", "quantity": 200, "unitCost": 75, "total": 15000 },
+      { "description": "Blancco Management Console License", "quantity": 1, "unitCost": 15000, "total": 15000 }
+    ],
+    "documents": { "dd250": "", "rip": "", "other": [] },
+    "notes": "NIST 800-88 compliant data sanitization for equipment disposal and repurposing."
+  }
+]

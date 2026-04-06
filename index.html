@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DCO CMS — Login</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Classification banner (top) -->
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <div class="login-page">
+    <div class="login-header">
+      <span class="login-star">&#9733;</span>
+      <div class="login-title">DCO Contract Management System</div>
+      <div class="login-subtitle">ARCYBER &nbsp;|&nbsp; Defensive Cyber Operations</div>
+    </div>
+
+    <div class="login-card">
+      <h2>Operator Authentication</h2>
+
+      <!-- Inline error display -->
+      <div class="error-msg" id="loginError"></div>
+
+      <form id="loginForm" autocomplete="off" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="username">Username</label>
+          <input
+            class="form-control"
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Enter username"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input
+            class="form-control"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <!-- GitHub PAT field: shown only when username === "APM" -->
+        <div class="form-group hidden" id="patGroup">
+          <label class="form-label" for="githubToken">GitHub Personal Access Token</label>
+          <input
+            class="form-control"
+            type="password"
+            id="githubToken"
+            name="githubToken"
+            placeholder="ghp_..."
+            autocomplete="off"
+          >
+          <div class="form-help">
+            Fine-grained PAT with Contents: Read &amp; Write for dco-app-demo repo only.
+            Required to save contract edits.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; margin-top:8px;">
+          AUTHENTICATE
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Classification banner (bottom) -->
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <!-- Load config then auth (no ES modules) -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // If already logged in, skip to dashboard
+    (function() {
+      if (AUTH.getSession()) window.location.href = 'dashboard.html';
+    })();
+
+    const usernameInput = document.getElementById('username');
+    const patGroup = document.getElementById('patGroup');
+    const loginError = document.getElementById('loginError');
+
+    // Dynamically show PAT field when superuser username is typed
+    usernameInput.addEventListener('input', function() {
+      const val = this.value.trim();
+      if (val === 'APM') {
+        patGroup.classList.remove('hidden');
+      } else {
+        patGroup.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const username = usernameInput.value.trim();
+      const password = document.getElementById('password').value;
+      const githubToken = document.getElementById('githubToken').value.trim();
+
+      loginError.classList.remove('visible');
+      loginError.textContent = '';
+
+      const result = AUTH.validate(username, password, githubToken);
+
+      if (!result.success) {
+        loginError.textContent = result.error;
+        loginError.classList.add('visible');
+        return;
+      }
+
+      AUTH.setSession(username, result.role, githubToken);
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+
+</body>
+</html>
