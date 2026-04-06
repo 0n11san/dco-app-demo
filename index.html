@@ -54,6 +54,9 @@
         <!-- GitHub PAT field: shown only when username === "APM" -->
         <div class="form-group hidden" id="patGroup">
           <label class="form-label" for="githubToken">GitHub Personal Access Token</label>
+          <div id="savedTokenNotice" class="hidden" style="background:var(--green-bg);border:1px solid var(--green-text);color:var(--green-text);padding:6px 10px;font-size:11px;margin-bottom:6px">
+            Saved token on file. Leave blank to use it, or paste a new one to replace it.
+          </div>
           <input
             class="form-control"
             type="password"
@@ -64,7 +67,7 @@
           >
           <div class="form-help">
             Fine-grained PAT with Contents: Read &amp; Write for dco-app-demo repo only.
-            Required to save contract edits.
+            Saved securely in your browser — only needs to be entered once.
           </div>
         </div>
 
@@ -91,13 +94,17 @@
     const patGroup = document.getElementById('patGroup');
     const loginError = document.getElementById('loginError');
 
-    // Dynamically show PAT field when superuser username is typed
+    // Dynamically show PAT field and saved-token notice when superuser username is typed
     usernameInput.addEventListener('input', function() {
       const val = this.value.trim();
       if (val === 'APM') {
         patGroup.classList.remove('hidden');
+        // Show notice if a token is already saved in localStorage
+        const saved = AUTH.getSavedToken();
+        document.getElementById('savedTokenNotice').classList.toggle('hidden', !saved);
       } else {
         patGroup.classList.add('hidden');
+        document.getElementById('savedTokenNotice').classList.add('hidden');
       }
     });
 
@@ -106,7 +113,9 @@
 
       const username = usernameInput.value.trim();
       const password = document.getElementById('password').value;
-      const githubToken = document.getElementById('githubToken').value.trim();
+      const typedToken = document.getElementById('githubToken').value.trim();
+      // Use typed token if provided, otherwise fall back to saved token
+      const githubToken = typedToken || AUTH.getSavedToken();
 
       loginError.classList.remove('visible');
       loginError.textContent = '';
