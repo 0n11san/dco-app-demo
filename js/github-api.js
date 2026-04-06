@@ -18,20 +18,18 @@ const GITHUB_API = {
   // Returns { contracts: [...], sha: "..." }
   getContracts: async function() {
     const url = this._fileUrl();
-    const resp = await fetch(url, {
+    // Add timestamp param to bust GitHub's CDN cache without triggering CORS preflight
+    const bustUrl = url + '?t=' + Date.now();
+    const resp = await fetch(bustUrl, {
       headers: {
         'Accept': 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-        // Bust cache: GitHub CDN sometimes serves stale data
-        'Cache-Control': 'no-cache'
-      },
-      // cache: 'no-store' ensures browser doesn't cache either
-      cache: 'no-store'
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
     });
 
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({}));
-      throw new Error(`GitHub API error ${resp.status}: ${err.message || resp.statusText}`);
+      throw new Error('GitHub API error ' + resp.status + ': ' + (err.message || resp.statusText));
     }
 
     const data = await resp.json();
@@ -52,7 +50,7 @@ const GITHUB_API = {
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(contracts, null, 2))));
 
     const body = {
-      message: `Update contracts.json [${new Date().toISOString()}]`,
+      message: 'Update contracts.json [' + new Date().toISOString() + ']',
       content: content,
       sha: sha
     };
@@ -70,7 +68,7 @@ const GITHUB_API = {
 
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({}));
-      throw new Error(`GitHub save error ${resp.status}: ${err.message || resp.statusText}`);
+      throw new Error('GitHub save error ' + resp.status + ': ' + (err.message || resp.statusText));
     }
 
     const result = await resp.json();
