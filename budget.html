@@ -240,9 +240,11 @@
 
     // ── Summary bar ──────────────────────────────────────────────
 
+    function cost(c) { return (c.costs && c.costs.totalCurrentCost) || 0; }
+
     function buildSummary(contracts) {
       var bar = document.getElementById('summaryBar');
-      var total = contracts.reduce(function(s, c) { return s + (c.total_current_cost || 0); }, 0);
+      var total = contracts.reduce(function(s, c) { return s + cost(c); }, 0);
 
       var cards = [
         { label: 'Total Contracts', value: contracts.length, money: false }
@@ -253,7 +255,7 @@
         var subset = contracts.filter(function(c) {
           return (c.porFundedBy || []).indexOf(por) !== -1;
         });
-        var sub = subset.reduce(function(s, c) { return s + (c.total_current_cost || 0); }, 0);
+        var sub = subset.reduce(function(s, c) { return s + cost(c); }, 0);
         cards.push({ label: por, value: sub, money: true, count: subset.length });
       });
 
@@ -314,7 +316,7 @@
       }
       var tbody = document.getElementById('bmdTbody');
       var sorted = contracts.slice().sort(function(a, b) {
-        return (b.total_current_cost || 0) - (a.total_current_cost || 0);
+        return cost(b) - cost(a);
       });
       tbody.innerHTML = sorted.map(function(c, idx) {
         var porFundHtml = (c.porFundedBy || []).map(function(p) { return '<span class="por-tag">' + p + '</span>'; }).join('') || '—';
@@ -387,14 +389,14 @@
     function buildMasterChart(contracts) {
       var container = document.getElementById('masterChartContainer');
       container.innerHTML = '';
-      var active = contracts.filter(function(c) { return (c.total_current_cost || 0) > 0; })
-        .sort(function(a, b) { return b.total_current_cost - a.total_current_cost; });
+      var active = contracts.filter(function(c) { return cost(c) > 0; })
+        .sort(function(a, b) { return cost(b) - cost(a); });
       if (active.length === 0) {
         container.innerHTML = '<div class="chart-card master-chart-card"><div class="no-data-msg">No cost data available.</div></div>';
         return;
       }
       var labels = active.map(function(c) { return c.deliveryOrderName; });
-      var values = active.map(function(c) { return c.total_current_cost; });
+      var values = active.map(function(c) { return cost(c); });
       var colors = active.map(function(_, i) { return PALETTE[i % PALETTE.length]; });
       var total  = values.reduce(function(a, b) { return a + b; }, 0);
 
@@ -425,8 +427,8 @@
       container.innerHTML = '';
       CONFIG.POR_OPTIONS.forEach(function(por, porIdx) {
         var subset = contracts.filter(function(c) {
-          return (c.porFundedBy || []).indexOf(por) !== -1 && (c.total_current_cost || 0) > 0;
-        }).sort(function(a, b) { return b.total_current_cost - a.total_current_cost; });
+          return (c.porFundedBy || []).indexOf(por) !== -1 && cost(c) > 0;
+        }).sort(function(a, b) { return cost(b) - cost(a); });
 
         var card = document.createElement('div');
         card.className = 'chart-card';
@@ -439,7 +441,7 @@
         }
 
         var labels = subset.map(function(c) { return c.deliveryOrderName; });
-        var values = subset.map(function(c) { return c.total_current_cost; });
+        var values = subset.map(function(c) { return cost(c); });
         var colors = subset.map(function(_, i) { return PALETTE[i % PALETTE.length]; });
         var total  = values.reduce(function(a, b) { return a + b; }, 0);
 
@@ -465,6 +467,8 @@
       XLSX.writeFile(wb, filename);
     }
 
+    var chartsBuilt = false;
+
     var BUDGET = {
 
       switchTab: function(name) {
@@ -472,6 +476,13 @@
           document.getElementById('tab-' + t).classList.toggle('active', t === name);
           document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === name);
         });
+        // Build charts the first time the Visualization tab is shown so
+        // Chart.js can measure the canvas dimensions correctly.
+        if (name === 'viz' && !chartsBuilt) {
+          chartsBuilt = true;
+          buildMasterChart(allContracts);
+          buildPORCharts(allContracts);
+        }
       },
 
       exportPdm: function() {
@@ -512,7 +523,7 @@
         if (isSU) headers = headers.concat(['BA8 Portion ($)','ARCYBER Portion ($)','ITEMS Fee ($)','GSA Fee ($)','Total Current Cost ($)','Projected Next FY ($)']);
         headers.push('PoP End');
         var rows = [headers];
-        var sorted = allContracts.slice().sort(function(a, b) { return (b.total_current_cost || 0) - (a.total_current_cost || 0); });
+        var sorted = allContracts.slice().sort(function(a, b) { return cost(b) - cost(a); });
         sorted.forEach(function(c, i) {
           var costs = c.costs || {};
           var row = [
@@ -556,8 +567,7 @@
           buildSummary(allContracts);
           buildPdmTable(allContracts);
           buildBmdTable(allContracts);
-          buildMasterChart(allContracts);
-          buildPORCharts(allContracts);
+          // Charts built lazily when Visualization tab is first opened
         } catch(e) {
           var el = document.getElementById('pageAlert');
           el.textContent = 'Failed to load: ' + e.message;
