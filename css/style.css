@@ -708,6 +708,56 @@ input[type="date"] { color-scheme: dark; }
   .btn { padding: 5px 10px; font-size: 11px; }
 }
 
+/* =========================================================
+   CUSTOM TOOLTIPS
+   Usage: <th data-tooltip="Description text">Column</th>
+   ========================================================= */
+[data-tooltip] {
+  position: relative;
+  cursor: default;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e2e1e;
+  color: var(--text);
+  border: 1px solid var(--gold);
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  width: 220px;
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+/* Keep tooltip on-screen for first/last columns */
+thead th:first-child[data-tooltip]::after,
+thead th:nth-child(2)[data-tooltip]::after {
+  left: 0;
+  transform: none;
+}
+
+thead th:last-child[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
 /* Utility */
 .hidden { display: none !important; }
 .text-right { text-align: right; }
