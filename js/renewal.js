@@ -100,7 +100,7 @@ const RENEWAL = {
         renewalCell = '<span class="user-badge" style="background:' + (c.renewalStatus === 'RENEW' ? 'var(--green-text)' : 'var(--red-text)') + '">' + c.renewalStatus + '</span>' +
           '<div style="font-size:10px;color:var(--text-muted);margin-top:2px">by ' + c.renewalSubmittedBy + '</div>';
       } else {
-        renewalCell = '<button class="action-btn" onclick="RENEWAL_MODAL.open(\'' + c.id + '\')">SUBMIT DECISION</button>';
+        renewalCell = '<button class="action-btn" onclick="RENEWAL_MODAL.open(\'' + c.id + '\')">REVIEW &amp; DECIDE</button>';
       }
 
       return '<tr class="' + statusCls + '">' +
@@ -143,6 +143,35 @@ const RENEWAL_MODAL = {
     document.getElementById('renewalModalTitle').textContent = contract.deliveryOrderName;
     document.getElementById('renewalModalDO').textContent = contract.deliveryOrderNumber;
     document.getElementById('renewalModalEnd').textContent = UTILS.formatDate(contract.popEndDate);
+
+    // Populate current line items so validators can judge against present quantities
+    const lineItems = contract.lineItems || [];
+    let liHtml;
+    if (lineItems.length === 0) {
+      liHtml = '<span class="text-muted" style="font-size:12px">No line items on record.</span>';
+    } else {
+      liHtml = '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
+        '<thead><tr>' +
+          '<th style="text-align:left;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em">Description</th>' +
+          '<th style="text-align:right;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em">Qty</th>' +
+          '<th style="padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em">Metric</th>' +
+        '</tr></thead><tbody>' +
+        lineItems.map(function(li) {
+          const isPrimary = li.id === contract.primaryLineItemId;
+          const metricStr = li.metricQuantity || li.quantity
+            ? (li.metricQuantity || li.quantity) + (li.metricType ? ' ' + li.metricType : '')
+            : '—';
+          return '<tr style="border-bottom:1px solid #1a2a1a">' +
+            '<td style="padding:6px 8px;color:var(--text)">' + li.description +
+              (isPrimary ? ' <span class="user-badge" style="background:var(--gold);color:#000;font-size:9px">PRIMARY</span>' : '') +
+            '</td>' +
+            '<td style="padding:6px 8px;text-align:right;color:var(--text-muted)">' + (li.quantity || '—') + '</td>' +
+            '<td style="padding:6px 8px;color:var(--gold);font-weight:600">' + metricStr + '</td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody></table>';
+    }
+    document.getElementById('renewalLineItems').innerHTML = liHtml;
 
     // Reset form
     document.getElementById('renewalForm').reset();
