@@ -53,8 +53,8 @@ const RENEWAL = {
   },
 
   statusClass: function(daysUntilSuspense) {
-    if (daysUntilSuspense <= 0)  return 'status-red';
-    if (daysUntilSuspense <= 14) return 'status-orange';
+    if (daysUntilSuspense <= 0)  return 'status-overdue';
+    if (daysUntilSuspense <= 14) return 'status-red';
     if (daysUntilSuspense <= 30) return 'status-yellow';
     return 'status-green';
   },
@@ -114,7 +114,6 @@ const RENEWAL = {
         '<td>' + porHtml + '</td>' +
         '<td><span class="status-badge badge-' + statusCls.replace('status-', '') + '">' + statusLbl + '</span></td>' +
         '<td>' + renewalCell + '</td>' +
-        '<td><button class="action-btn" onclick="DETAIL.open(\'' + c.id + '\')">VIEW</button></td>' +
         '</tr>';
     }).join('');
   },

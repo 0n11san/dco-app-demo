@@ -47,7 +47,7 @@
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    (function() { if (AUTH.getSession()) window.location.href = 'dashboard.html'; })();
+    (function() { if (AUTH.getSession()) window.location.href = 'landing.html'; })();
 
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -63,7 +63,7 @@
         return;
       }
       AUTH.setSession(username, result.role);
-      window.location.href = 'dashboard.html';
+      window.location.href = 'landing.html';
     });
   </script>
 </body>

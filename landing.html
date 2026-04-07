@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DCO CMS — Home</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <nav class="navbar">
+    <a href="landing.html" class="navbar-brand" style="text-decoration:none;color:var(--gold)"><span class="star">&#9733;</span> DCO CMS</a>
+    <div class="navbar-center">ARCYBER &nbsp;|&nbsp; DEFENSIVE CYBER OPERATIONS</div>
+    <div class="navbar-right">
+      <a href="dashboard.html" class="btn btn-outline btn-sm">CONTRACT DASHBOARD</a>
+      <a href="renewal.html" class="btn btn-outline btn-sm">RENEWAL TRACKER</a>
+      <a href="priorities.html" class="btn btn-outline btn-sm">ARCYBER PRIORITIES</a>
+      <a href="budget.html" class="btn btn-outline btn-sm">BUDGET OVERVIEW</a>
+      <a href="audit-log.html" class="btn btn-outline btn-sm su-only">ACTIVITY LOG</a>
+      <a href="email-demo.html" class="btn btn-outline btn-sm su-only">EMAIL DEMO</a>
+      <span id="navUsername" class="text-muted" style="font-size:12px"></span>
+      <span id="navRoleBadge" class="user-badge"></span>
+      <button id="logoutBtn" class="btn btn-outline btn-sm">LOGOUT</button>
+    </div>
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
+  </nav>
+  <div class="mobile-nav-dropdown" id="mobileNav">
+    <div class="mobile-user-info"><span id="mobileNavUsername"></span> &nbsp;<span id="mobileNavRole" class="user-badge"></span></div>
+    <a href="dashboard.html">CONTRACT DASHBOARD</a>
+    <a href="renewal.html">RENEWAL TRACKER</a>
+    <a href="priorities.html">ARCYBER PRIORITIES</a>
+    <a href="budget.html">BUDGET OVERVIEW</a>
+    <a href="audit-log.html" class="su-only">ACTIVITY LOG</a>
+    <a href="email-demo.html" class="su-only">EMAIL DEMO</a>
+    <button id="mobileLogoutBtn">LOGOUT</button>
+  </div>
+
+  <main class="main-content" style="max-width:960px;margin:0 auto">
+
+    <div style="margin-bottom:28px;margin-top:16px">
+      <div class="page-title" style="font-size:1.1rem;margin-bottom:6px">DCO Contract Management System</div>
+      <div style="font-size:12px;color:var(--text-muted);letter-spacing:0.05em">
+        Welcome, <strong id="welcomeUser" class="text-gold"></strong>. Select a module below to begin.
+      </div>
+    </div>
+
+    <div class="landing-grid">
+
+      <!-- CONTRACT DASHBOARD -->
+      <a href="dashboard.html" class="landing-card">
+        <div class="landing-card-icon">&#128196;</div>
+        <div class="landing-card-title">Contract Dashboard</div>
+        <div class="landing-card-desc">
+          View and manage all active DCO delivery orders. Access vendor POCs, cost breakdowns, PoP dates, and contract documents.
+        </div>
+      </a>
+
+      <!-- RENEWAL TRACKER -->
+      <a href="renewal.html" class="landing-card">
+        <div class="landing-card-icon">&#8987;</div>
+        <div class="landing-card-title">Renewal Tracker</div>
+        <div class="landing-card-desc">
+          Monitor upcoming contract renewals with urgency-based status indicators. Submit RENEW or SUNSET decisions with justification and capability feedback.
+        </div>
+      </a>
+
+      <!-- ARCYBER PRIORITIES (placeholder) -->
+      <a href="priorities.html" class="landing-card" style="opacity:0.7;cursor:default" onclick="return false">
+        <div class="landing-card-icon">&#127919;</div>
+        <div class="landing-card-title">ARCYBER Priorities</div>
+        <div class="landing-card-desc">
+          View and track command-level priorities aligned to DCO mission areas and program objectives.
+        </div>
+        <span class="landing-card-badge">Coming Soon</span>
+      </a>
+
+      <!-- BUDGET OVERVIEW (placeholder) -->
+      <a href="budget.html" class="landing-card" style="opacity:0.7;cursor:default" onclick="return false">
+        <div class="landing-card-icon">&#128200;</div>
+        <div class="landing-card-title">Budget Overview</div>
+        <div class="landing-card-desc">
+          Summarize BA8 and ARCYBER-funded contract obligations, projected next-FY costs, and GSA/ITEMS fee totals.
+        </div>
+        <span class="landing-card-badge">Coming Soon</span>
+      </a>
+
+      <!-- ACTIVITY LOG (superuser only) -->
+      <a href="audit-log.html" class="landing-card su-only">
+        <div class="landing-card-icon">&#128221;</div>
+        <div class="landing-card-title">Activity Log</div>
+        <div class="landing-card-desc">
+          Full audit trail of all contract creates, updates, deletions, and renewal decisions with timestamps and user attribution.
+        </div>
+        <span class="landing-card-badge" style="background:var(--red-bg);border:1px solid var(--red-text);color:var(--red-text)">Superuser Only</span>
+      </a>
+
+      <!-- EMAIL DEMO (superuser only) -->
+      <a href="email-demo.html" class="landing-card su-only">
+        <div class="landing-card-icon">&#128140;</div>
+        <div class="landing-card-title">Email Demo</div>
+        <div class="landing-card-desc">
+          Preview automated renewal notification emails (120-, 90-, and 60-day notices) for any contract before the email service is activated.
+        </div>
+        <span class="landing-card-badge" style="background:var(--red-bg);border:1px solid var(--red-text);color:var(--red-text)">Superuser Only</span>
+      </a>
+
+    </div>
+
+  </main>
+
+  <div class="page-footer">UNCLASSIFIED // FOR OFFICIAL USE ONLY &nbsp;|&nbsp; DCO Contract Management System &nbsp;|&nbsp; ARCYBER</div>
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var session = AUTH.requireAuth();
+      if (!session) return;
+
+      var isSU = session.role === 'superuser';
+
+      document.getElementById('navUsername').textContent = session.username;
+      document.getElementById('navRoleBadge').textContent = isSU ? 'Superuser' : 'User';
+      document.getElementById('welcomeUser').textContent = session.username;
+
+      document.getElementById('logoutBtn').addEventListener('click', function() { AUTH.logout(); });
+
+      // Hide superuser-only elements
+      document.querySelectorAll('.su-only').forEach(function(el) {
+        el.classList.toggle('hidden', !isSU);
+      });
+
+      // Sync mobile nav user info
+      var mu = document.getElementById('mobileNavUsername');
+      var mr = document.getElementById('mobileNavRole');
+      if (mu) mu.textContent = session.username;
+      if (mr) mr.textContent = isSU ? 'Superuser' : 'User';
+    });
+
+    (function() {
+      var btn = document.getElementById('hamburgerBtn');
+      var nav = document.getElementById('mobileNav');
+      if (btn && nav) btn.addEventListener('click', function() { nav.classList.toggle('open'); });
+      var mobileLogout = document.getElementById('mobileLogoutBtn');
+      if (mobileLogout) mobileLogout.addEventListener('click', function() { AUTH.logout(); });
+    })();
+  </script>
+</body>
+</html>

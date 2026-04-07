@@ -17,17 +17,31 @@
   </div>
 
   <nav class="navbar">
-    <div class="navbar-brand"><span class="star">&#9733;</span> DCO CMS</div>
+    <a href="landing.html" class="navbar-brand" style="text-decoration:none;color:var(--gold)"><span class="star">&#9733;</span> DCO CMS</a>
     <div class="navbar-center">CONTRACT DASHBOARD</div>
     <div class="navbar-right">
+      <a href="dashboard.html" class="btn btn-outline btn-sm">CONTRACT DASHBOARD</a>
       <a href="renewal.html" class="btn btn-outline btn-sm">RENEWAL TRACKER</a>
+      <a href="priorities.html" class="btn btn-outline btn-sm">ARCYBER PRIORITIES</a>
+      <a href="budget.html" class="btn btn-outline btn-sm">BUDGET OVERVIEW</a>
       <a href="audit-log.html" class="btn btn-outline btn-sm su-only">ACTIVITY LOG</a>
       <a href="email-demo.html" class="btn btn-outline btn-sm su-only">EMAIL DEMO</a>
       <span id="navUsername" class="text-muted" style="font-size:12px"></span>
       <span id="navRoleBadge" class="user-badge"></span>
       <button id="logoutBtn" class="btn btn-outline btn-sm">LOGOUT</button>
     </div>
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
   </nav>
+  <div class="mobile-nav-dropdown" id="mobileNav">
+    <div class="mobile-user-info"><span id="mobileNavUsername"></span> &nbsp;<span id="mobileNavRole" class="user-badge"></span></div>
+    <a href="dashboard.html">CONTRACT DASHBOARD</a>
+    <a href="renewal.html">RENEWAL TRACKER</a>
+    <a href="priorities.html">ARCYBER PRIORITIES</a>
+    <a href="budget.html">BUDGET OVERVIEW</a>
+    <a href="audit-log.html" class="su-only">ACTIVITY LOG</a>
+    <a href="email-demo.html" class="su-only">EMAIL DEMO</a>
+    <button id="mobileLogoutBtn">LOGOUT</button>
+  </div>
 
   <main class="main-content">
     <div class="alert" id="pageAlert"></div>
@@ -298,5 +312,22 @@
   <script src="js/export.js"></script>
   <script src="js/dashboard.js"></script>
   <script>document.addEventListener('DOMContentLoaded', function() { DASHBOARD.init(); });</script>
+  <script>
+    (function() {
+      var btn = document.getElementById('hamburgerBtn');
+      var nav = document.getElementById('mobileNav');
+      if (btn && nav) btn.addEventListener('click', function() { nav.classList.toggle('open'); });
+      var mobileLogout = document.getElementById('mobileLogoutBtn');
+      if (mobileLogout) mobileLogout.addEventListener('click', function() { AUTH.logout(); });
+      // Populate mobile user badge from session
+      var session = AUTH.getSession();
+      if (session) {
+        var mu = document.getElementById('mobileNavUsername');
+        var mr = document.getElementById('mobileNavRole');
+        if (mu) mu.textContent = session.username;
+        if (mr) mr.textContent = session.role === 'superuser' ? 'Superuser' : 'User';
+      }
+    })();
+  </script>
 </body>
 </html>

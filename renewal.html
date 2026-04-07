@@ -6,8 +6,8 @@
   <title>DCO CMS — Renewal Tracker</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
+    .badge-overdue { background:#0a0a0a;        color:#e0e0e0;             border:1px solid var(--red-text);    padding:2px 7px;font-size:10px;font-weight:700;letter-spacing:.06em }
     .badge-red    { background:var(--red-bg);    color:var(--red-text);    border:1px solid var(--red-text);    padding:2px 7px;font-size:10px;font-weight:700;letter-spacing:.06em }
-    .badge-orange { background:var(--orange-bg); color:var(--orange-text); border:1px solid var(--orange-text); padding:2px 7px;font-size:10px;font-weight:700;letter-spacing:.06em }
     .badge-yellow { background:var(--yellow-bg); color:var(--yellow-text); border:1px solid var(--yellow-text); padding:2px 7px;font-size:10px;font-weight:700;letter-spacing:.06em }
     .badge-green  { background:var(--green-bg);  color:var(--green-text);  border:1px solid var(--green-text);  padding:2px 7px;font-size:10px;font-weight:700;letter-spacing:.06em }
     .legend { display:flex;gap:16px;flex-wrap:wrap;font-size:11px;margin-bottom:14px }
@@ -24,16 +24,31 @@
   </div>
 
   <nav class="navbar">
-    <div class="navbar-brand"><span class="star">&#9733;</span> DCO CMS</div>
+    <a href="landing.html" class="navbar-brand" style="text-decoration:none;color:var(--gold)"><span class="star">&#9733;</span> DCO CMS</a>
     <div class="navbar-center">RENEWAL TRACKER</div>
     <div class="navbar-right">
       <a href="dashboard.html" class="btn btn-outline btn-sm">CONTRACT DASHBOARD</a>
+      <a href="renewal.html" class="btn btn-outline btn-sm">RENEWAL TRACKER</a>
+      <a href="priorities.html" class="btn btn-outline btn-sm">ARCYBER PRIORITIES</a>
+      <a href="budget.html" class="btn btn-outline btn-sm">BUDGET OVERVIEW</a>
       <a href="audit-log.html" class="btn btn-outline btn-sm su-only">ACTIVITY LOG</a>
+      <a href="email-demo.html" class="btn btn-outline btn-sm su-only">EMAIL DEMO</a>
       <span id="navUsername" class="text-muted" style="font-size:12px"></span>
       <span id="navRoleBadge" class="user-badge"></span>
       <button id="logoutBtn" class="btn btn-outline btn-sm">LOGOUT</button>
     </div>
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
   </nav>
+  <div class="mobile-nav-dropdown" id="mobileNav">
+    <div class="mobile-user-info"><span id="mobileNavUsername"></span> &nbsp;<span id="mobileNavRole" class="user-badge"></span></div>
+    <a href="dashboard.html">CONTRACT DASHBOARD</a>
+    <a href="renewal.html">RENEWAL TRACKER</a>
+    <a href="priorities.html">ARCYBER PRIORITIES</a>
+    <a href="budget.html">BUDGET OVERVIEW</a>
+    <a href="audit-log.html" class="su-only">ACTIVITY LOG</a>
+    <a href="email-demo.html" class="su-only">EMAIL DEMO</a>
+    <button id="mobileLogoutBtn">LOGOUT</button>
+  </div>
 
   <main class="main-content">
     <div class="alert" id="pageAlert"></div>
@@ -46,8 +61,8 @@
 
     <div class="legend">
       <span style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.07em;align-self:center">Status:</span>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--red-text)"></div><span class="text-muted">Suspense overdue</span></div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--orange-text)"></div><span class="text-muted">0–14 days (Critical)</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red-text);border:1px solid var(--red-text)"></div><span class="text-muted">Suspense overdue (Overdue)</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red-text)"></div><span class="text-muted">0–14 days (Critical)</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--yellow-text)"></div><span class="text-muted">15–30 days (Warning)</span></div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--green-text)"></div><span class="text-muted">&gt;30 days (Monitor)</span></div>
     </div>
@@ -73,7 +88,6 @@
           <th data-tooltip="Associated Program(s) of Record supported">POR(s) Supported</th>
           <th data-tooltip="Urgency status based on suspense deadline">Status</th>
           <th data-tooltip="Renewal decision submitted by a validator">Decision</th>
-          <th style="width:60px"></th>
         </tr></thead>
         <tbody id="renewalTbody"></tbody>
       </table>
@@ -173,5 +187,21 @@
   <script src="js/dashboard.js"></script>
   <script src="js/renewal.js"></script>
   <script>document.addEventListener('DOMContentLoaded', function() { RENEWAL.init(); });</script>
+  <script>
+    (function() {
+      var btn = document.getElementById('hamburgerBtn');
+      var nav = document.getElementById('mobileNav');
+      if (btn && nav) btn.addEventListener('click', function() { nav.classList.toggle('open'); });
+      var mobileLogout = document.getElementById('mobileLogoutBtn');
+      if (mobileLogout) mobileLogout.addEventListener('click', function() { AUTH.logout(); });
+      var session = AUTH.getSession();
+      if (session) {
+        var mu = document.getElementById('mobileNavUsername');
+        var mr = document.getElementById('mobileNavRole');
+        if (mu) mu.textContent = session.username;
+        if (mr) mr.textContent = session.role === 'superuser' ? 'Superuser' : 'User';
+      }
+    })();
+  </script>
 </body>
 </html>
