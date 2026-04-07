@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DCO CMS — ARCYBER Priorities</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <style>
+    .priority-list { list-style: none; margin: 0; padding: 0; }
+
+    .priority-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--modal-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--army-green);
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      cursor: grab;
+      transition: background 0.1s, border-color 0.1s;
+      user-select: none;
+    }
+
+    .priority-item:active { cursor: grabbing; }
+    .priority-item.sortable-ghost { opacity: 0.35; }
+    .priority-item.sortable-drag  { background: #1a2e1a; border-color: var(--gold); }
+
+    .priority-rank {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--gold);
+      width: 32px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .priority-drag-handle {
+      color: var(--text-muted);
+      font-size: 16px;
+      flex-shrink: 0;
+      cursor: grab;
+    }
+
+    .priority-name {
+      flex: 1;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .priority-do {
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .priority-arrows {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .arrow-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 22px;
+      height: 18px;
+      cursor: pointer;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .arrow-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .arrow-btn:disabled { opacity: 0.25; cursor: default; }
+
+    .unranked-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .unranked-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .save-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--nav-bg);
+      border-top: 2px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner-lg"></div><span>Loading...</span>
+  </div>
+
+  <nav class="navbar" style="position:relative">
+    <a href="landing.html" class="navbar-brand" style="text-decoration:none;color:var(--gold)"><span class="star">&#9733;</span> DCO CMS</a>
+    <div class="navbar-center">ARCYBER PRIORITIES</div>
+    <div class="navbar-right">
+      <a href="dashboard.html" class="btn btn-outline btn-sm">CONTRACT DASHBOARD</a>
+      <a href="renewal.html" class="btn btn-outline btn-sm">RENEWAL TRACKER</a>
+      <a href="priorities.html" class="btn btn-outline btn-sm">ARCYBER PRIORITIES</a>
+      <a href="budget.html" class="btn btn-outline btn-sm">BUDGET OVERVIEW</a>
+      <a href="audit-log.html" class="btn btn-outline btn-sm su-only">ACTIVITY LOG</a>
+      <a href="email-demo.html" class="btn btn-outline btn-sm su-only">EMAIL DEMO</a>
+      <span id="navUsername" class="text-muted" style="font-size:12px"></span>
+      <span id="navRoleBadge" class="user-badge"></span>
+      <button id="logoutBtn" class="btn btn-outline btn-sm">LOGOUT</button>
+    </div>
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
+  </nav>
+  <div class="mobile-nav-dropdown" id="mobileNav">
+    <div class="mobile-user-info"><span id="mobileNavUsername"></span> &nbsp;<span id="mobileNavRole" class="user-badge"></span></div>
+    <a href="dashboard.html">CONTRACT DASHBOARD</a>
+    <a href="renewal.html">RENEWAL TRACKER</a>
+    <a href="priorities.html">ARCYBER PRIORITIES</a>
+    <a href="budget.html">BUDGET OVERVIEW</a>
+    <a href="audit-log.html" class="su-only">ACTIVITY LOG</a>
+    <a href="email-demo.html" class="su-only">EMAIL DEMO</a>
+    <button id="mobileLogoutBtn">LOGOUT</button>
+  </div>
+
+  <main class="main-content" style="padding-bottom:0">
+
+    <div class="alert" id="pageAlert"></div>
+
+    <div class="page-header">
+      <div class="page-title">ARCYBER Requirements Priority List</div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.6">
+      Drag rows or use the arrow buttons to set the priority order for delivery orders.
+      This shared ranking is visible to all users and saved when you click <strong style="color:var(--gold)">SAVE ORDER</strong>.
+      Changes are attributed to your account in the activity log.
+    </p>
+
+    <ul class="priority-list" id="priorityList"></ul>
+
+    <div class="unranked-section hidden" id="unrankedSection">
+      <div class="unranked-label">Unranked Delivery Orders</div>
+      <ul class="priority-list" id="unrankedList"></ul>
+    </div>
+
+  </main>
+
+  <div class="save-bar">
+    <button class="btn btn-gold" id="btnSave" onclick="PRIORITIES.save()">SAVE ORDER</button>
+    <button class="btn btn-outline" onclick="PRIORITIES.load()">RESET</button>
+    <span id="saveStatus" style="font-size:11px;color:var(--text-muted)"></span>
+  </div>
+
+  <div class="page-footer" style="margin-top:0">UNCLASSIFIED // FOR OFFICIAL USE ONLY &nbsp;|&nbsp; DCO Contract Management System &nbsp;|&nbsp; ARCYBER</div>
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <script src="js/tooltip.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const PRIORITIES = {
+      items: [],
+      sortable: null,
+
+      init: async function() {
+        const session = AUTH.requireAuth();
+        if (!session) return;
+        document.getElementById('navUsername').textContent = session.username;
+        document.getElementById('navRoleBadge').textContent = session.role === 'superuser' ? 'Superuser' : 'User';
+        document.getElementById('logoutBtn').addEventListener('click', function() { AUTH.logout(); });
+        document.querySelectorAll('.su-only').forEach(function(el) {
+          el.classList.toggle('hidden', session.role !== 'superuser');
+        });
+        await this.load();
+      },
+
+      load: async function() {
+        document.getElementById('loadingOverlay').classList.add('active');
+        try {
+          this.items = await API.getPriorities();
+          this.render();
+        } catch(e) {
+          this.showAlert('error', 'Failed to load: ' + e.message);
+        } finally {
+          document.getElementById('loadingOverlay').classList.remove('active');
+        }
+      },
+
+      render: function() {
+        const ranked   = this.items.filter(function(i) { return i.rank !== null; });
+        const unranked = this.items.filter(function(i) { return i.rank === null; });
+        const list     = document.getElementById('priorityList');
+        const uSection = document.getElementById('unrankedSection');
+        const uList    = document.getElementById('unrankedList');
+
+        list.innerHTML = ranked.map(function(item, idx) {
+          return PRIORITIES.buildRow(item, idx, ranked.length, false);
+        }).join('');
+
+        // Also add unranked items to the main list so they can be dragged in
+        unranked.forEach(function(item) {
+          const li = document.createElement('li');
+          li.className = 'priority-item';
+          li.dataset.id = item.id;
+          li.innerHTML = PRIORITIES.buildRowHTML(item, null, false, true);
+          list.appendChild(li);
+        });
+
+        // Destroy existing sortable before re-init
+        if (this.sortable) this.sortable.destroy();
+        this.sortable = Sortable.create(list, {
+          animation: 150,
+          ghostClass: 'sortable-ghost',
+          dragClass:  'sortable-drag',
+          handle:     '.priority-drag-handle',
+          onEnd: function() { PRIORITIES.refreshRanks(); }
+        });
+
+        // Unranked sidebar (collapsed if all ranked)
+        if (unranked.length > 0) {
+          uSection.classList.remove('hidden');
+          uList.innerHTML = '';
+        } else {
+          uSection.classList.add('hidden');
+        }
+
+        document.getElementById('saveStatus').textContent = '';
+      },
+
+      buildRow: function(item, idx, total, isUnranked) {
+        return '<li class="priority-item" data-id="' + item.id + '">' +
+          this.buildRowHTML(item, idx, total, isUnranked) +
+        '</li>';
+      },
+
+      buildRowHTML: function(item, idx, total, isUnranked) {
+        const rankDisplay = isUnranked ? '—' : (idx + 1);
+        const isFirst = idx === 0;
+        const isLast  = idx !== null && idx === total - 1;
+        return '<span class="priority-drag-handle" title="Drag to reorder">&#8597;</span>' +
+          '<span class="priority-rank">' + rankDisplay + '</span>' +
+          '<span class="priority-name">' + item.name + '</span>' +
+          '<span class="priority-do">' + (item.doNumber || '') + '</span>' +
+          '<div class="priority-arrows">' +
+            '<button class="arrow-btn" onclick="PRIORITIES.move(this, -1)" ' + (isFirst ? 'disabled' : '') + ' title="Move up">&#9650;</button>' +
+            '<button class="arrow-btn" onclick="PRIORITIES.move(this, 1)"  ' + (isLast  ? 'disabled' : '') + ' title="Move down">&#9660;</button>' +
+          '</div>';
+      },
+
+      move: function(btn, direction) {
+        const item = btn.closest('.priority-item');
+        const list = item.parentElement;
+        const items = Array.from(list.children);
+        const idx   = items.indexOf(item);
+        const target = items[idx + direction];
+        if (!target) return;
+        if (direction === -1) list.insertBefore(item, target);
+        else list.insertBefore(target, item);
+        this.refreshRanks();
+      },
+
+      refreshRanks: function() {
+        const items = Array.from(document.querySelectorAll('#priorityList .priority-item'));
+        items.forEach(function(el, idx) {
+          const rankEl = el.querySelector('.priority-rank');
+          if (rankEl) rankEl.textContent = idx + 1;
+          const upBtn  = el.querySelector('.arrow-btn:first-child');
+          const dnBtn  = el.querySelector('.arrow-btn:last-child');
+          if (upBtn) upBtn.disabled = idx === 0;
+          if (dnBtn) dnBtn.disabled = idx === items.length - 1;
+        });
+        document.getElementById('saveStatus').textContent = 'Unsaved changes';
+        document.getElementById('saveStatus').style.color = 'var(--yellow-text)';
+      },
+
+      save: async function() {
+        const orderedIds = Array.from(document.querySelectorAll('#priorityList .priority-item'))
+          .map(function(el) { return el.dataset.id; });
+
+        document.getElementById('loadingOverlay').classList.add('active');
+        try {
+          await API.savePriorities(orderedIds);
+          document.getElementById('saveStatus').textContent = 'Saved.';
+          document.getElementById('saveStatus').style.color = 'var(--green-text)';
+          await this.load();
+        } catch(e) {
+          this.showAlert('error', 'Save failed: ' + e.message);
+        } finally {
+          document.getElementById('loadingOverlay').classList.remove('active');
+        }
+      },
+
+      showAlert: function(type, msg) {
+        const el = document.getElementById('pageAlert');
+        el.textContent = msg;
+        el.className = 'alert alert-' + type + ' visible';
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() { PRIORITIES.init(); });
+
+    // Hamburger
+    (function() {
+      var btn = document.getElementById('hamburgerBtn');
+      var nav = document.getElementById('mobileNav');
+      if (btn && nav) btn.addEventListener('click', function() { nav.classList.toggle('open'); });
+      var ml = document.getElementById('mobileLogoutBtn');
+      if (ml) ml.addEventListener('click', function() { AUTH.logout(); });
+      var s = AUTH.getSession();
+      if (s) {
+        var mu = document.getElementById('mobileNavUsername');
+        var mr = document.getElementById('mobileNavRole');
+        if (mu) mu.textContent = s.username;
+        if (mr) mr.textContent = s.role === 'superuser' ? 'Superuser' : 'User';
+      }
+    })();
+  </script>
+</body>
+</html>

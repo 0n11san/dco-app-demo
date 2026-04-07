@@ -77,6 +77,24 @@ const API = {
     return await resp.json();
   },
 
+  // GET /api/priorities
+  getPriorities: async function() {
+    const resp = await fetch(this.BASE + '/api/priorities', { headers: this._headers() });
+    if (!resp.ok) throw new Error('Failed to load priorities: ' + resp.status);
+    return await resp.json();
+  },
+
+  // PUT /api/priorities
+  savePriorities: async function(orderedIds) {
+    const resp = await fetch(this.BASE + '/api/priorities', {
+      method: 'PUT',
+      headers: this._headers(),
+      body: JSON.stringify({ orderedIds })
+    });
+    if (!resp.ok) throw new Error('Failed to save priorities');
+    return await resp.json();
+  },
+
   // GET /api/audit-log
   getAuditLog: async function() {
     const resp = await fetch(this.BASE + '/api/audit-log', { headers: this._headers() });
