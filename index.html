@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- Classification banner (top) -->
   <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
 
   <div class="login-page">
@@ -21,117 +20,51 @@
     <div class="login-card">
       <h2>Operator Authentication</h2>
 
-      <!-- Inline error display -->
       <div class="error-msg" id="loginError"></div>
 
       <form id="loginForm" autocomplete="off" novalidate>
         <div class="form-group">
           <label class="form-label" for="username">Username</label>
-          <input
-            class="form-control"
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Enter username"
-            autocomplete="username"
-            required
-          >
+          <input class="form-control" type="text" id="username" name="username"
+            placeholder="Enter username" autocomplete="username" required>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="password">Password</label>
-          <input
-            class="form-control"
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter password"
-            autocomplete="current-password"
-            required
-          >
+          <input class="form-control" type="password" id="password" name="password"
+            placeholder="Enter password" autocomplete="current-password" required>
         </div>
 
-        <!-- GitHub PAT field: shown only when username === "APM" -->
-        <div class="form-group hidden" id="patGroup">
-          <label class="form-label" for="githubToken">GitHub Personal Access Token</label>
-          <div id="savedTokenNotice" class="hidden" style="background:var(--green-bg);border:1px solid var(--green-text);color:var(--green-text);padding:6px 10px;font-size:11px;margin-bottom:6px">
-            Saved token on file. Leave blank to use it, or paste a new one to replace it.
-          </div>
-          <input
-            class="form-control"
-            type="password"
-            id="githubToken"
-            name="githubToken"
-            placeholder="ghp_..."
-            autocomplete="off"
-          >
-          <div class="form-help">
-            Fine-grained PAT with Contents: Read &amp; Write for dco-app-demo repo only.
-            Saved securely in your browser — only needs to be entered once.
-          </div>
-        </div>
-
-        <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; margin-top:8px;">
+        <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;margin-top:8px">
           AUTHENTICATE
         </button>
       </form>
     </div>
   </div>
 
-  <!-- Classification banner (bottom) -->
   <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
 
-  <!-- Load config then auth (no ES modules) -->
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // If already logged in, skip to dashboard
-    (function() {
-      if (AUTH.getSession()) window.location.href = 'dashboard.html';
-    })();
-
-    const usernameInput = document.getElementById('username');
-    const patGroup = document.getElementById('patGroup');
-    const loginError = document.getElementById('loginError');
-
-    // Dynamically show PAT field and saved-token notice when superuser username is typed
-    usernameInput.addEventListener('input', function() {
-      const val = this.value.trim();
-      if (val === 'APM') {
-        patGroup.classList.remove('hidden');
-        // Show notice if a token is already saved in localStorage
-        const saved = AUTH.getSavedToken();
-        document.getElementById('savedTokenNotice').classList.toggle('hidden', !saved);
-      } else {
-        patGroup.classList.add('hidden');
-        document.getElementById('savedTokenNotice').classList.add('hidden');
-      }
-    });
+    (function() { if (AUTH.getSession()) window.location.href = 'dashboard.html'; })();
 
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
-
-      const username = usernameInput.value.trim();
+      const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value;
-      const typedToken = document.getElementById('githubToken').value.trim();
-      // Use typed token if provided, otherwise fall back to saved token
-      const githubToken = typedToken || AUTH.getSavedToken();
+      const errorEl = document.getElementById('loginError');
+      errorEl.classList.remove('visible');
 
-      loginError.classList.remove('visible');
-      loginError.textContent = '';
-
-      const result = AUTH.validate(username, password, githubToken);
-
+      const result = AUTH.validate(username, password);
       if (!result.success) {
-        loginError.textContent = result.error;
-        loginError.classList.add('visible');
+        errorEl.textContent = result.error;
+        errorEl.classList.add('visible');
         return;
       }
-
-      AUTH.setSession(username, result.role, githubToken);
+      AUTH.setSession(username, result.role);
       window.location.href = 'dashboard.html';
     });
   </script>
-
 </body>
 </html>

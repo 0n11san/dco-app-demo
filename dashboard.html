@@ -5,27 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DCO CMS — Dashboard</title>
   <link rel="stylesheet" href="css/style.css">
-  <!-- SheetJS for Excel export/import -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
   <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
 
-  <!-- Loading overlay -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-spinner-lg"></div>
     <span>Loading...</span>
   </div>
 
-  <!-- Nav -->
   <nav class="navbar">
-    <div class="navbar-brand">
-      <span class="star">&#9733;</span> DCO CMS
-    </div>
+    <div class="navbar-brand"><span class="star">&#9733;</span> DCO CMS</div>
     <div class="navbar-center">CONTRACT DASHBOARD</div>
     <div class="navbar-right">
       <a href="renewal.html" class="btn btn-outline btn-sm">RENEWAL TRACKER</a>
+      <a href="audit-log.html" class="btn btn-outline btn-sm su-only">ACTIVITY LOG</a>
+      <a href="email-demo.html" class="btn btn-outline btn-sm su-only">EMAIL DEMO</a>
       <span id="navUsername" class="text-muted" style="font-size:12px"></span>
       <span id="navRoleBadge" class="user-badge"></span>
       <button id="logoutBtn" class="btn btn-outline btn-sm">LOGOUT</button>
@@ -33,46 +30,43 @@
   </nav>
 
   <main class="main-content">
-
-    <!-- Inline alert -->
     <div class="alert" id="pageAlert"></div>
 
-    <!-- Page header / controls -->
     <div class="page-header">
       <div class="page-title">Active Contracts &nbsp;<span id="contractCount" class="text-muted" style="font-size:11px;font-weight:400;letter-spacing:0"></span></div>
       <div class="controls-bar">
-        <!-- Superuser only -->
         <label class="btn btn-outline btn-sm su-only" style="cursor:pointer" title="Upload CSV or Excel to bulk-update contracts">
           UPLOAD CSV/XLSX
           <input type="file" id="uploadInput" accept=".csv,.xlsx,.xls" style="display:none">
         </label>
         <button class="btn btn-primary btn-sm su-only" id="btnAddContract">+ ADD CONTRACT</button>
-        <!-- All users -->
         <button class="btn btn-outline btn-sm" id="btnExportCSV">EXPORT CSV</button>
         <button class="btn btn-outline btn-sm" id="btnExportExcel">EXPORT EXCEL</button>
       </div>
     </div>
 
-    <!-- Contract table -->
     <div class="table-wrapper">
       <table id="contractTable">
         <thead>
-          <tr id="tableHead">
+          <tr>
             <th style="width:32px">#</th>
             <th title="Name of the delivery order or primary software/vendor">Delivery Order Name</th>
             <th title="Official delivery order number assigned by the contracting office">DO #</th>
-            <!-- Superuser-only columns added by JS -->
             <th class="su-only" title="Primary vendor point(s) of contact">Vendor POC(s)</th>
             <th class="su-only" title="Vendor POC email address">Email</th>
             <th class="su-only" title="Vendor POC phone number">Phone</th>
             <th class="su-only text-right" title="Budget Activity 8 funded portion of this contract">BA8 Portion</th>
             <th class="su-only text-right" title="ARCYBER-funded portion of this contract">ARCYBER Portion</th>
             <th class="su-only text-right" title="1% administrative fee applied via the ITEMS contracting vehicle">ITEMS Fee (1%)</th>
-            <th class="su-only text-right" title="2% GSA Schedule fee">GSA Fee (2%)</th>
+            <th class="su-only text-right" title="2% GSA Schedule fee applied to the contract base cost">GSA Fee (2%)</th>
             <th class="su-only text-right" title="Total obligated cost inclusive of all fees and line items">Total Current Cost</th>
-            <th class="su-only text-right" title="Estimated cost for the upcoming fiscal year">Projected Next FY</th>
-            <!-- All users -->
-            <th title="Associated Program(s) of Record: GDP, DDS, F&amp;MA, or Miscellaneous">POR(s)</th>
+            <th class="su-only text-right" title="Estimated total cost for the upcoming fiscal year">Projected Next FY</th>
+            <th title="Program(s) of Record this contract directly supports">POR(s) Supported</th>
+            <th title="Program of Record providing the funding for this contract">POR Funded By</th>
+            <th title="Contracting vehicle used to execute this delivery order (CHESS ITES-4H for hardware, CHESS ITES SW for software)">Vehicle</th>
+            <th title="Organization facilitating the contracting action (typically ITEMSS GSA)">Facilitated By</th>
+            <th title="Indicates whether this contract will sunset (end) at PoP expiration or be renewed. N/A if not applicable.">Sunsetting?</th>
+            <th title="Primary performance metric for this delivery order (e.g., number of endpoints, seats, or cores licensed)">Primary Metric</th>
             <th title="Period of Performance begin date">PoP Begin</th>
             <th title="Period of Performance end date">PoP End</th>
             <th class="su-only" style="width:50px"></th>
@@ -86,9 +80,9 @@
   <div class="page-footer">UNCLASSIFIED // FOR OFFICIAL USE ONLY &nbsp;|&nbsp; DCO Contract Management System &nbsp;|&nbsp; ARCYBER</div>
   <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
 
-  <!-- ─── DETAIL MODAL ─────────────────────────────────────────────────── -->
+  <!-- DETAIL MODAL -->
   <div class="modal-overlay" id="detailOverlay">
-    <div class="modal" style="max-width:800px">
+    <div class="modal" style="max-width:820px">
       <div class="modal-header">
         <div>
           <div class="modal-title" id="detailTitle"></div>
@@ -98,25 +92,28 @@
       </div>
       <div class="modal-body" style="max-height:75vh;overflow-y:auto">
 
-        <!-- Vendor Info (superuser only) -->
         <div class="modal-section" id="detailVendorSection">
           <div class="modal-section-title">Vendor Information</div>
           <div id="detailVendorBody"></div>
         </div>
 
-        <!-- Contract Details -->
         <div class="modal-section">
           <div class="modal-section-title">Contract Details</div>
           <div id="detailInfoBody"></div>
         </div>
 
-        <!-- Cost Breakdown (superuser only) -->
+        <div class="modal-section" id="detailCapSection">
+          <div class="modal-section-title">Capability Description</div>
+          <div id="detailCapBody" style="font-size:13px;line-height:1.6;color:var(--text)"></div>
+        </div>
+
         <div class="modal-section" id="detailCostSection">
-          <div class="modal-section-title">Cost Breakdown &amp; Summary</div>
+          <div class="modal-section-title">Cost Breakdown &amp; Summary
+            <span style="font-size:10px;font-weight:400;margin-left:8px;color:var(--text-muted)">Click &#9733; to set primary metric</span>
+          </div>
           <div id="detailCostBody"></div>
         </div>
 
-        <!-- Documents (superuser only) -->
         <div class="modal-section" id="detailDocsSection">
           <div class="modal-section-title">Contract Documents</div>
           <div id="detailDocsBody"></div>
@@ -129,20 +126,17 @@
     </div>
   </div>
 
-  <!-- ─── EDIT / ADD MODAL ─────────────────────────────────────────────── -->
+  <!-- EDIT / ADD MODAL -->
   <div class="modal-overlay" id="editOverlay">
-    <div class="modal" style="max-width:820px">
+    <div class="modal" style="max-width:860px">
       <div class="modal-header">
         <div class="modal-title" id="editModalTitle">Edit Contract</div>
         <button class="modal-close" onclick="EDIT.close()">&#10005;</button>
       </div>
       <div class="modal-body" style="max-height:78vh;overflow-y:auto">
-
         <div class="alert" id="editAlert"></div>
-
         <form id="editForm" onsubmit="return false">
 
-          <!-- Basic info -->
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="editName">Delivery Order Name *</label>
@@ -154,14 +148,36 @@
             </div>
           </div>
 
-          <!-- Vendor POCs -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editVehicle">Contracting Vehicle</label>
+              <select class="form-control" id="editVehicle" name="editVehicle">
+                <option value="">— Select —</option>
+                <option value="CHESS ITES SW">CHESS ITES SW (Software)</option>
+                <option value="CHESS ITES-4H">CHESS ITES-4H (Hardware)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editFacilitatedBy">Facilitated By</label>
+              <input class="form-control" type="text" id="editFacilitatedBy" name="editFacilitatedBy" value="ITEMSS GSA">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editSunsetting">Sunsetting?</label>
+              <input class="form-control" type="text" id="editSunsetting" name="editSunsetting" placeholder="N/A or YYYY-MM-DD">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editCapDesc">Capability Description</label>
+            <textarea class="form-control" id="editCapDesc" name="editCapDesc" placeholder="Describe what this solution does for DCO operations..." style="min-height:70px"></textarea>
+          </div>
+
           <div class="form-group">
             <label class="form-label">Vendor POC(s)</label>
             <div id="pocContainer"></div>
             <button type="button" class="btn btn-outline btn-sm mt-8" onclick="EDIT.addPOC()">+ Add POC</button>
           </div>
 
-          <!-- Costs -->
           <div class="modal-section-title" style="margin-bottom:10px">Cost Information</div>
           <div class="form-row">
             <div class="form-group">
@@ -175,7 +191,6 @@
                 oninput="EDIT._updateFeeDisplay(parseFloat(document.getElementById('editBA8').value)||0, parseFloat(this.value)||0)">
             </div>
           </div>
-          <!-- Auto-calculated fees display -->
           <div style="background:#0a0e0a;border:1px solid var(--border);padding:10px;font-size:12px;margin-bottom:14px">
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
               <div><div class="text-muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.07em">ITEMS Fee (1%)</div><div id="calcItemsFee" class="fw-bold">$0</div></div>
@@ -184,22 +199,33 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="editProjected">Projected Next FY Cost ($)</label>
+            <label class="form-label" for="editProjected">Projected Next FY ($)</label>
             <input class="form-control" type="number" id="editProjected" name="editProjected" value="0" min="0" style="max-width:220px">
           </div>
 
-          <!-- POR -->
-          <div class="form-group">
-            <label class="form-label">Program of Record(s)</label>
-            <div class="checkbox-group">
-              <label class="checkbox-label"><input type="checkbox" class="por-checkbox" value="GDP"> GDP</label>
-              <label class="checkbox-label"><input type="checkbox" class="por-checkbox" value="DDS"> DDS</label>
-              <label class="checkbox-label"><input type="checkbox" class="por-checkbox" value="F&MA"> F&amp;MA</label>
-              <label class="checkbox-label"><input type="checkbox" class="por-checkbox" value="Miscellaneous"> Miscellaneous</label>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">POR(s) Supported</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" class="por-sup-checkbox" value="GDP"> GDP</label>
+                <label class="checkbox-label"><input type="checkbox" class="por-sup-checkbox" value="DDS"> DDS</label>
+                <label class="checkbox-label"><input type="checkbox" class="por-sup-checkbox" value="F&MA"> F&amp;MA</label>
+                <label class="checkbox-label"><input type="checkbox" class="por-sup-checkbox" value="Tools"> Tools</label>
+                <label class="checkbox-label"><input type="checkbox" class="por-sup-checkbox" value="Miscellaneous"> Misc</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">POR Funded By</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" class="por-fund-checkbox" value="GDP"> GDP</label>
+                <label class="checkbox-label"><input type="checkbox" class="por-fund-checkbox" value="DDS"> DDS</label>
+                <label class="checkbox-label"><input type="checkbox" class="por-fund-checkbox" value="F&MA"> F&amp;MA</label>
+                <label class="checkbox-label"><input type="checkbox" class="por-fund-checkbox" value="Tools"> Tools</label>
+                <label class="checkbox-label"><input type="checkbox" class="por-fund-checkbox" value="Miscellaneous"> Misc</label>
+              </div>
             </div>
           </div>
 
-          <!-- PoP dates -->
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="editPopBegin">PoP Begin Date</label>
@@ -211,25 +237,29 @@
             </div>
           </div>
 
-          <!-- Line items -->
           <div class="form-group">
-            <label class="form-label">Line Items</label>
+            <label class="form-label">Line Items &amp; Metrics</label>
             <table class="line-items-table" style="width:100%">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th style="width:80px">Qty</th>
-                  <th style="width:130px">Unit Cost ($)</th>
-                  <th style="width:130px">Total ($)</th>
-                  <th style="width:36px"></th>
-                </tr>
-              </thead>
+              <thead><tr>
+                <th>Description</th>
+                <th style="width:70px">Qty</th>
+                <th style="width:110px">Unit Cost ($)</th>
+                <th style="width:110px">Total ($)</th>
+                <th style="width:130px">Metric Type</th>
+                <th style="width:80px">Metric Qty</th>
+                <th style="width:36px"></th>
+              </tr></thead>
               <tbody id="lineItemsTbody"></tbody>
             </table>
             <button type="button" class="btn btn-outline btn-sm mt-8" onclick="EDIT.addLineItem()">+ Add Line Item</button>
           </div>
 
-          <!-- Documents -->
+          <div class="form-group">
+            <label class="form-label">Requirement Validators <span class="text-muted" style="font-weight:400;text-transform:none;letter-spacing:0">(will receive automated renewal email notifications)</span></label>
+            <div id="validatorContainer"></div>
+            <button type="button" class="btn btn-outline btn-sm mt-8" onclick="EDIT.addValidator()">+ Add Validator</button>
+          </div>
+
           <div class="modal-section-title" style="margin-bottom:10px">Contract Documents</div>
           <div class="form-row">
             <div class="form-group">
@@ -246,7 +276,6 @@
             <textarea class="form-control" id="editDocOther" placeholder="https://&#10;https://"></textarea>
           </div>
 
-          <!-- Notes -->
           <div class="form-group">
             <label class="form-label" for="editNotes">Notes</label>
             <textarea class="form-control" id="editNotes" name="editNotes" placeholder="Internal notes..."></textarea>
@@ -264,13 +293,9 @@
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
-  <script src="js/github-api.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/export.js"></script>
   <script src="js/dashboard.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      DASHBOARD.init();
-    });
-  </script>
+  <script>document.addEventListener('DOMContentLoaded', function() { DASHBOARD.init(); });</script>
 </body>
 </html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DCO CMS — Email Notification Demo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .email-preview {
+      background: #0a0f0a;
+      border: 1px solid var(--border);
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--text);
+      padding: 20px 24px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    .email-header-row { display: grid; grid-template-columns: 80px 1fr; gap: 6px 12px; font-size: 12px; margin-bottom: 16px; }
+    .email-header-label { color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: .07em; align-self: start; padding-top: 2px; }
+    .tab-row { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 16px; }
+    .tab { padding: 8px 18px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .tab:hover { color: var(--text); }
+    .not-sent-banner {
+      background: var(--yellow-bg); border: 1px solid var(--gold); border-left: 4px solid var(--gold);
+      color: var(--gold); padding: 10px 14px; font-size: 12px; margin-bottom: 16px; line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner-lg"></div><span>Loading...</span>
+  </div>
+
+  <nav class="navbar">
+    <div class="navbar-brand"><span class="star">&#9733;</span> DCO CMS</div>
+    <div class="navbar-center">EMAIL NOTIFICATION DEMO</div>
+    <div class="navbar-right">
+      <a href="dashboard.html" class="btn btn-outline btn-sm">CONTRACT DASHBOARD</a>
+      <a href="renewal.html" class="btn btn-outline btn-sm">RENEWAL TRACKER</a>
+      <span id="navUsername" class="text-muted" style="font-size:12px"></span>
+      <span id="navRoleBadge" class="user-badge"></span>
+      <button id="logoutBtn" class="btn btn-outline btn-sm">LOGOUT</button>
+    </div>
+  </nav>
+
+  <main class="main-content" style="max-width:900px">
+
+    <div class="alert" id="pageAlert"></div>
+
+    <div class="not-sent-banner">
+      <strong>DEMO MODE — No emails are being sent.</strong>
+      This page previews the automated renewal notification emails that validators would receive
+      at 120, 90, and 60 days before each contract's PoP end date. Email sending will be
+      activated once an authorized email service is configured.
+    </div>
+
+    <div style="margin-bottom:20px">
+      <label class="form-label" for="contractSelect">Select Contract to Preview</label>
+      <select class="form-control" id="contractSelect" style="max-width:440px" onchange="EMAIL_DEMO.loadPreview()">
+        <option value="">— Select a contract —</option>
+      </select>
+    </div>
+
+    <div id="previewPanel" class="hidden">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+        <div style="background:var(--modal-bg);border:1px solid var(--border);padding:12px;text-align:center">
+          <div class="text-muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Days Until PoP End</div>
+          <div id="infoExpiry" class="fw-bold" style="font-size:1.2rem;color:var(--gold)">—</div>
+        </div>
+        <div style="background:var(--modal-bg);border:1px solid var(--border);padding:12px;text-align:center">
+          <div class="text-muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Suspense Date</div>
+          <div id="infoSuspense" class="fw-bold" style="font-size:1rem">—</div>
+        </div>
+        <div style="background:var(--modal-bg);border:1px solid var(--border);padding:12px;text-align:center">
+          <div class="text-muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Validators</div>
+          <div id="infoValidators" style="font-size:11px;color:var(--text)">—</div>
+        </div>
+      </div>
+
+      <div class="tab-row">
+        <div class="tab active" onclick="EMAIL_DEMO.showTab(0, this)">120-Day Notice <span class="text-muted">(Weekly)</span></div>
+        <div class="tab" onclick="EMAIL_DEMO.showTab(1, this)">90-Day Notice <span class="text-muted">(Bi-Weekly)</span></div>
+        <div class="tab" onclick="EMAIL_DEMO.showTab(2, this)">60-Day Notice <span class="text-muted">(3x/Week)</span></div>
+      </div>
+
+      <div id="emailTab0">
+        <div class="email-header-row" id="emailHeaders0"></div>
+        <div class="email-preview" id="emailBody0"></div>
+      </div>
+      <div id="emailTab1" class="hidden">
+        <div class="email-header-row" id="emailHeaders1"></div>
+        <div class="email-preview" id="emailBody1"></div>
+      </div>
+      <div id="emailTab2" class="hidden">
+        <div class="email-header-row" id="emailHeaders2"></div>
+        <div class="email-preview" id="emailBody2"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <div class="page-footer">UNCLASSIFIED // FOR OFFICIAL USE ONLY &nbsp;|&nbsp; DCO Contract Management System &nbsp;|&nbsp; ARCYBER</div>
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const EMAIL_DEMO = {
+      contracts: [],
+      activeTab: 0,
+
+      init: async function() {
+        const session = AUTH.requireAuth();
+        if (!session) return;
+        if (session.role !== 'superuser') { window.location.href = 'dashboard.html'; return; }
+
+        document.getElementById('navUsername').textContent = session.username;
+        document.getElementById('navRoleBadge').textContent = 'Superuser';
+        document.getElementById('logoutBtn').addEventListener('click', function() { AUTH.logout(); });
+
+        document.getElementById('loadingOverlay').classList.add('active');
+        try {
+          this.contracts = await API.getContracts();
+          const sel = document.getElementById('contractSelect');
+          this.contracts.forEach(function(c) {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.deliveryOrderName + ' — ' + c.deliveryOrderNumber;
+            sel.appendChild(opt);
+          });
+        } catch(e) {
+          const el = document.getElementById('pageAlert');
+          el.textContent = 'Failed to load contracts: ' + e.message;
+          el.className = 'alert alert-error visible';
+        } finally {
+          document.getElementById('loadingOverlay').classList.remove('active');
+        }
+      },
+
+      loadPreview: async function() {
+        const id = document.getElementById('contractSelect').value;
+        if (!id) { document.getElementById('previewPanel').classList.add('hidden'); return; }
+
+        document.getElementById('loadingOverlay').classList.add('active');
+        try {
+          const data = await API.getEmailPreview(id);
+          document.getElementById('previewPanel').classList.remove('hidden');
+
+          document.getElementById('infoExpiry').textContent = data.daysUntilEnd + ' days';
+          document.getElementById('infoSuspense').textContent = UTILS.formatDate(data.suspenseDate);
+          document.getElementById('infoValidators').innerHTML = data.validators.length
+            ? data.validators.join('<br>')
+            : '<span class="text-muted">No validators assigned</span>';
+
+          data.previews.forEach(function(preview, i) {
+            const toStr = preview.to.length ? preview.to.join(', ') : '(no validators assigned)';
+            document.getElementById('emailHeaders' + i).innerHTML =
+              '<span class="email-header-label">To</span><span>' + toStr + '</span>' +
+              '<span class="email-header-label">Subject</span><span>' + preview.subject + '</span>' +
+              '<span class="email-header-label">Frequency</span><span class="text-gold">' + preview.frequency.toUpperCase() + '</span>';
+            document.getElementById('emailBody' + i).textContent = preview.body;
+          });
+
+          this.showTab(0, document.querySelectorAll('.tab')[0]);
+        } catch(e) {
+          const el = document.getElementById('pageAlert');
+          el.textContent = 'Failed to load preview: ' + e.message;
+          el.className = 'alert alert-error visible';
+        } finally {
+          document.getElementById('loadingOverlay').classList.remove('active');
+        }
+      },
+
+      showTab: function(idx, tabEl) {
+        [0, 1, 2].forEach(function(i) {
+          document.getElementById('emailTab' + i).classList.toggle('hidden', i !== idx);
+        });
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        if (tabEl) tabEl.classList.add('active');
+        this.activeTab = idx;
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() { EMAIL_DEMO.init(); });
+  </script>
+</body>
+</html>

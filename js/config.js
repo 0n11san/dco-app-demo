@@ -1,24 +1,20 @@
-// js/config.js
-// DCO Contract Management System - Configuration
+// js/config.js — DCO CMS Configuration
 // WARNING: Credentials are base64-encoded for demo obfuscation only.
 // This is NOT real security. Do not use with classified or sensitive data.
 
 const CONFIG = {
-  GITHUB_OWNER: '0n11san',
-  GITHUB_REPO: 'dco-app-demo',
-  DATA_FILE: 'data/contracts.json',
+  WORKER_URL: 'https://dco-worker.jon-ev-smi.workers.dev',
 
   // DEMO CREDENTIALS — NOT FOR USE WITH REAL DATA
-  // Passwords are btoa-encoded (base64), not hashed — demo only
   USERS: {
-    'APM': { passwordHash: btoa('Dco2025!'), role: 'superuser' },
+    'APM':        { passwordHash: btoa('Dco2025!'), role: 'superuser' },
     'ChiefNeely': { passwordHash: btoa('Dco2025!'), role: 'regular' }
   },
 
-  // POR options
-  POR_OPTIONS: ['GDP', 'DDS', 'F&MA', 'Miscellaneous'],
+  POR_OPTIONS:     ['GDP', 'DDS', 'F&MA', 'Tools', 'Miscellaneous'],
+  VEHICLE_OPTIONS: ['CHESS ITES-4H', 'CHESS ITES SW'],
+  METRIC_TYPES:    ['seats', 'endpoints', 'cores', 'users', 'processors', 'nodes', 'servers', 'workstations', 'gb/day', 'credits', 'unlimited', 'units'],
 
-  // Renewal thresholds (days)
   RENEWAL_LEAD_TIME: 45,
-  RENEWAL_WINDOW: 120
+  RENEWAL_WINDOW:    120,
 };

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DCO CMS — Activity Log</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner-lg"></div><span>Loading...</span>
+  </div>
+
+  <nav class="navbar">
+    <div class="navbar-brand"><span class="star">&#9733;</span> DCO CMS</div>
+    <div class="navbar-center">ACTIVITY LOG</div>
+    <div class="navbar-right">
+      <a href="dashboard.html" class="btn btn-outline btn-sm">CONTRACT DASHBOARD</a>
+      <a href="renewal.html" class="btn btn-outline btn-sm">RENEWAL TRACKER</a>
+      <span id="navUsername" class="text-muted" style="font-size:12px"></span>
+      <span id="navRoleBadge" class="user-badge"></span>
+      <button id="logoutBtn" class="btn btn-outline btn-sm">LOGOUT</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="alert" id="pageAlert"></div>
+
+    <div class="page-header">
+      <div class="page-title">Activity Log <span id="logCount" class="text-muted" style="font-size:11px;font-weight:400;letter-spacing:0"></span></div>
+      <div class="controls-bar">
+        <select class="form-control" id="filterAction" style="width:160px;padding:5px 8px;font-size:12px" onchange="AUDIT.applyFilter()">
+          <option value="">All Actions</option>
+          <option value="CREATE">Create</option>
+          <option value="UPDATE">Update</option>
+          <option value="DELETE">Delete</option>
+          <option value="RENEWAL">Renewal Decision</option>
+        </select>
+        <input class="form-control" type="text" id="filterContract" style="width:200px;padding:5px 8px;font-size:12px" placeholder="Filter by contract..." oninput="AUDIT.applyFilter()">
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead><tr>
+          <th style="width:32px">#</th>
+          <th title="Date and time the action occurred">Timestamp (UTC)</th>
+          <th title="User who performed the action">User</th>
+          <th title="Contract affected by this action">Contract</th>
+          <th title="Type of action performed">Action</th>
+          <th title="Details of what changed">Details</th>
+        </tr></thead>
+        <tbody id="auditTbody"></tbody>
+      </table>
+    </div>
+
+    <div class="hidden" id="auditEmpty" style="padding:40px;text-align:center;color:var(--text-muted);border:1px solid var(--border)">
+      No activity recorded yet.
+    </div>
+  </main>
+
+  <div class="page-footer">UNCLASSIFIED // FOR OFFICIAL USE ONLY &nbsp;|&nbsp; DCO Contract Management System &nbsp;|&nbsp; ARCYBER</div>
+  <div class="classification-banner">UNCLASSIFIED // FOR OFFICIAL USE ONLY</div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const AUDIT = {
+      entries: [],
+      filtered: [],
+
+      init: async function() {
+        const session = AUTH.requireAuth();
+        if (!session) return;
+        // Superuser only
+        if (session.role !== 'superuser') { window.location.href = 'dashboard.html'; return; }
+
+        document.getElementById('navUsername').textContent = session.username;
+        document.getElementById('navRoleBadge').textContent = 'Superuser';
+        document.getElementById('logoutBtn').addEventListener('click', function() { AUTH.logout(); });
+
+        document.getElementById('loadingOverlay').classList.add('active');
+        try {
+          this.entries = await API.getAuditLog();
+          this.filtered = this.entries;
+          this.render();
+        } catch(e) {
+          const el = document.getElementById('pageAlert');
+          el.textContent = 'Failed to load audit log: ' + e.message;
+          el.className = 'alert alert-error visible';
+        } finally {
+          document.getElementById('loadingOverlay').classList.remove('active');
+        }
+      },
+
+      applyFilter: function() {
+        const action   = document.getElementById('filterAction').value.toLowerCase();
+        const contract = document.getElementById('filterContract').value.toLowerCase();
+        this.filtered  = this.entries.filter(function(e) {
+          const matchAction   = !action   || e.action.toLowerCase() === action;
+          const matchContract = !contract || (e.contractName || '').toLowerCase().includes(contract);
+          return matchAction && matchContract;
+        });
+        this.render();
+      },
+
+      actionClass: function(action) {
+        if (action === 'CREATE')  return 'text-green';
+        if (action === 'DELETE')  return 'text-red';
+        if (action === 'RENEWAL') return 'text-gold';
+        return 'text-muted';
+      },
+
+      formatDetails: function(entry) {
+        const d = entry.details || {};
+        if (entry.action === 'RENEWAL') {
+          return 'Decision: <strong>' + (d.decision || '—') + '</strong>' +
+            (d.quantity ? ' | Qty: ' + d.quantity : '') +
+            (d.justification ? ' | ' + d.justification.slice(0, 80) + (d.justification.length > 80 ? '...' : '') : '');
+        }
+        if (entry.action === 'UPDATE' && d.changes && d.changes.length) {
+          return d.changes.map(function(c) {
+            if (typeof c === 'string') return c;
+            return c.field + ': ' + (c.from !== undefined ? '"' + c.from + '" &rarr; "' + c.to + '"' : c.to);
+          }).join(' &nbsp;|&nbsp; ');
+        }
+        if (entry.action === 'CREATE') return 'DO: ' + (d.deliveryOrderNumber || '—');
+        return JSON.stringify(d);
+      },
+
+      render: function() {
+        document.getElementById('logCount').textContent = this.filtered.length + ' entr' + (this.filtered.length !== 1 ? 'ies' : 'y');
+        const tbody   = document.getElementById('auditTbody');
+        const isEmpty = document.getElementById('auditEmpty');
+
+        if (this.filtered.length === 0) {
+          tbody.innerHTML = '';
+          isEmpty.classList.remove('hidden');
+          return;
+        }
+        isEmpty.classList.add('hidden');
+
+        tbody.innerHTML = this.filtered.map(function(e, idx) {
+          const ts = e.changedAt ? e.changedAt.replace('T', ' ').slice(0, 19) : '—';
+          return '<tr>' +
+            '<td class="row-num">' + (idx + 1) + '</td>' +
+            '<td class="muted" style="white-space:nowrap">' + ts + '</td>' +
+            '<td><strong>' + e.changedBy + '</strong></td>' +
+            '<td>' + (e.contractName || '—') + '</td>' +
+            '<td><span class="' + AUDIT.actionClass(e.action) + ' fw-bold" style="font-size:11px;letter-spacing:.06em">' + e.action + '</span></td>' +
+            '<td style="font-size:11px;color:var(--text-muted)">' + AUDIT.formatDetails(e) + '</td>' +
+          '</tr>';
+        }).join('');
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() { AUDIT.init(); });
+  </script>
+</body>
+</html>
