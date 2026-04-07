@@ -6,6 +6,7 @@
   <title>DCO CMS — ARCYBER Priorities</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     .priority-list { list-style: none; margin: 0; padding: 0; }
 
@@ -169,6 +170,7 @@
   <div class="save-bar">
     <button class="btn btn-gold" id="btnSave" onclick="PRIORITIES.save()">SAVE ORDER</button>
     <button class="btn btn-outline" onclick="PRIORITIES.load()">RESET</button>
+    <button class="btn btn-outline" onclick="PRIORITIES.export()">EXPORT</button>
     <span id="saveStatus" style="font-size:11px;color:var(--text-muted)"></span>
   </div>
 
@@ -311,6 +313,22 @@
         } finally {
           document.getElementById('loadingOverlay').classList.remove('active');
         }
+      },
+
+      export: function() {
+        if (typeof XLSX === 'undefined') { alert('Export library not loaded.'); return; }
+        // Build current ordered list from the DOM
+        const rows = [['Rank', 'Delivery Order Name', 'DO #']];
+        Array.from(document.querySelectorAll('#priorityList .priority-item')).forEach(function(el, idx) {
+          const id = el.dataset.id;
+          const item = PRIORITIES.items.find(function(i) { return String(i.id) === String(id); });
+          rows.push([idx + 1, item ? item.name : '—', item ? (item.doNumber || '') : '']);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [{ wch: 6 }, { wch: 40 }, { wch: 20 }];
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'ARCYBER Priorities');
+        XLSX.writeFile(wb, 'arcyber-priorities-' + new Date().toISOString().slice(0,10) + '.xlsx');
       },
 
       showAlert: function(type, msg) {

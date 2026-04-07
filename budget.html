@@ -6,148 +6,61 @@
   <title>DCO CMS — Budget Overview</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    .budget-summary-bar {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-
+    /* Summary cards */
+    .budget-summary-bar { display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px; }
     .summary-card {
-      background: var(--modal-bg);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--army-green);
-      padding: 14px 20px;
-      flex: 1;
-      min-width: 160px;
+      background:var(--modal-bg);border:1px solid var(--border);
+      border-left:3px solid var(--army-green);padding:12px 18px;
+      flex:1;min-width:140px;
     }
-
     .summary-card .label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+      font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--text-muted);margin-bottom:5px;
     }
+    .summary-card .value { font-size:1.3rem;font-weight:700;color:var(--gold); }
+    .summary-card .value.redacted { font-size:0.8rem;color:var(--text-muted);font-style:italic;font-weight:400; }
+    .summary-card .sub { font-size:10px;color:var(--text-muted);margin-top:2px; }
 
-    .summary-card .value {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--gold);
+    /* View tables */
+    .view-header {
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:12px;flex-wrap:wrap;gap:8px;
     }
-
-    .summary-card .value.redacted {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-style: italic;
-      font-weight: 400;
+    .view-title {
+      font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--text-muted);
     }
+    .redacted-cell { color:var(--text-muted);font-style:italic; }
+    .cost-cell { text-align:right;color:var(--gold);font-weight:600; }
+    .total-cell { text-align:right;color:var(--gold);font-weight:700; }
 
+    /* Visualization */
     .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-      margin-bottom: 32px;
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+      gap:20px;margin-bottom:32px;
     }
-
-    .chart-card {
-      background: var(--modal-bg);
-      border: 1px solid var(--border);
-      padding: 16px;
-    }
-
+    .chart-card { background:var(--modal-bg);border:1px solid var(--border);padding:16px; }
     .chart-card-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--gold);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);
     }
-
-    .chart-card-subtitle {
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .chart-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 260px;
-      margin: 0 auto;
-    }
-
-    .master-chart-card {
-      grid-column: 1 / -1;
-    }
-
-    .master-chart-card .chart-wrapper {
-      max-width: 380px;
-    }
-
-    .legend-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 14px;
-      font-size: 11px;
-    }
-
-    .legend-table td {
-      padding: 4px 6px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .legend-table tr:last-child td { border-bottom: none; }
-
-    .legend-swatch {
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-      display: inline-block;
-      margin-right: 6px;
-      flex-shrink: 0;
-      vertical-align: middle;
-    }
-
-    .legend-name {
-      color: var(--text-main);
-    }
-
-    .legend-value {
-      text-align: right;
-      color: var(--gold);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .legend-pct {
-      text-align: right;
-      color: var(--text-muted);
-      white-space: nowrap;
-      width: 40px;
-    }
-
-    .no-data-msg {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 12px;
-      padding: 30px 0;
-    }
-
+    .chart-card-subtitle { font-size:10px;color:var(--text-muted);margin-bottom:12px; }
+    .chart-wrapper { position:relative;width:100%;max-width:260px;margin:0 auto; }
+    .master-chart-card { grid-column:1 / -1; }
+    .master-chart-card .chart-wrapper { max-width:380px; }
+    .legend-table { width:100%;border-collapse:collapse;margin-top:14px;font-size:11px; }
+    .legend-table td { padding:4px 6px;border-bottom:1px solid var(--border); }
+    .legend-table tr:last-child td { border-bottom:none; }
+    .legend-swatch { width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:6px;vertical-align:middle; }
+    .legend-name { color:var(--text-main); }
+    .legend-value { text-align:right;color:var(--gold);font-weight:600;white-space:nowrap; }
+    .legend-pct { text-align:right;color:var(--text-muted);white-space:nowrap;width:40px; }
+    .no-data-msg { text-align:center;color:var(--text-muted);font-size:12px;padding:30px 0; }
     .section-heading {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin: 28px 0 12px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--border);
+      font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--text-muted);margin:20px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border);
     }
   </style>
 </head>
@@ -187,20 +100,92 @@
   </div>
 
   <main class="main-content">
-
     <div class="alert" id="pageAlert"></div>
 
     <div class="page-header">
       <div class="page-title">Budget Overview</div>
     </div>
 
+    <!-- Summary bar (always visible) -->
     <div class="budget-summary-bar" id="summaryBar"></div>
 
-    <div class="section-heading">Total Portfolio</div>
-    <div class="charts-grid" id="masterChartContainer"></div>
+    <!-- Tab bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tabBtnPdm"  onclick="BUDGET.switchTab('pdm')">PdM View</button>
+      <button class="tab-btn"        id="tabBtnBmd"  onclick="BUDGET.switchTab('bmd')">BMD View</button>
+      <button class="tab-btn"        id="tabBtnViz"  onclick="BUDGET.switchTab('viz')">Visualization</button>
+    </div>
 
-    <div class="section-heading">By Program of Record (POR)</div>
-    <div class="charts-grid" id="porChartsContainer"></div>
+    <!-- ── PdM View ───────────────────────────────────────── -->
+    <div class="tab-content active" id="tab-pdm">
+      <div class="view-header">
+        <div>
+          <div class="view-title">PdM View — Delivery Order Summary</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:3px">
+            Columns will be refined once Sok's format is provided.
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="BUDGET.exportPdm()">EXPORT EXCEL</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="pdmTable">
+          <thead><tr>
+            <th style="width:32px">#</th>
+            <th>Delivery Order Name</th>
+            <th>DO #</th>
+            <th>POR(s) Supported</th>
+            <th>POR Funded By</th>
+            <th>Vehicle</th>
+            <th>PoP Begin</th>
+            <th>PoP End</th>
+            <th>Primary Metric</th>
+            <th>Renewal Status</th>
+            <th>Notes</th>
+          </tr></thead>
+          <tbody id="pdmTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── BMD View ───────────────────────────────────────── -->
+    <div class="tab-content" id="tab-bmd">
+      <div class="view-header">
+        <div>
+          <div class="view-title">BMD View — Budget &amp; Cost Summary</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:3px">
+            Columns will be refined once Bridgett's format is provided.
+            <span id="bmdRoleNote"></span>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="BUDGET.exportBmd()">EXPORT EXCEL</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="bmdTable">
+          <thead><tr>
+            <th style="width:32px">#</th>
+            <th>Delivery Order Name</th>
+            <th>DO #</th>
+            <th>POR Funded By</th>
+            <th class="su-only text-right">BA8 Portion</th>
+            <th class="su-only text-right">ARCYBER Portion</th>
+            <th class="su-only text-right">ITEMS Fee (1%)</th>
+            <th class="su-only text-right">GSA Fee (2%)</th>
+            <th class="su-only text-right">Total Current Cost</th>
+            <th class="su-only text-right">Projected Next FY</th>
+            <th>PoP End</th>
+          </tr></thead>
+          <tbody id="bmdTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Visualization ─────────────────────────────────── -->
+    <div class="tab-content" id="tab-viz">
+      <div class="section-heading">Total Portfolio</div>
+      <div class="charts-grid" id="masterChartContainer"></div>
+      <div class="section-heading">By Program of Record (POR Funded By)</div>
+      <div class="charts-grid" id="porChartsContainer"></div>
+    </div>
 
   </main>
 
@@ -213,7 +198,6 @@
   <script src="js/utils.js"></script>
   <script src="js/api.js"></script>
   <script>
-    // Chart.js global defaults — army theme
     Chart.defaults.color = '#8a9a8a';
     Chart.defaults.font.family = "'Courier New', Courier, monospace";
     Chart.defaults.font.size = 11;
@@ -228,6 +212,8 @@
     var isSU = false;
     var allContracts = [];
 
+    // ── Helpers ──────────────────────────────────────────────────
+
     function fmt(n) {
       return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
@@ -237,53 +223,132 @@
       try { return JSON.parse(raw); } catch(e) { return []; }
     }
 
+    function renewalStatusForContract(c) {
+      if (!c.popEndDate) return null;
+      var today = new Date(); today.setHours(0,0,0,0);
+      var end = new Date(c.popEndDate + 'T12:00:00');
+      var daysUntilEnd = Math.ceil((end - today) / 86400000);
+      if (daysUntilEnd > CONFIG.RENEWAL_WINDOW) return null;
+      var suspDate = new Date(end);
+      suspDate.setDate(suspDate.getDate() - CONFIG.RENEWAL_LEAD_TIME);
+      var daysUntilSusp = Math.ceil((suspDate - today) / 86400000);
+      if (daysUntilSusp <= 0)  return { cls:'overdue', lbl:'OVERDUE' };
+      if (daysUntilSusp <= 14) return { cls:'red',     lbl:'CRITICAL' };
+      if (daysUntilSusp <= 30) return { cls:'yellow',  lbl:'WARNING' };
+      return { cls:'green', lbl:'MONITOR' };
+    }
+
+    // ── Summary bar ──────────────────────────────────────────────
+
     function buildSummary(contracts) {
       var bar = document.getElementById('summaryBar');
       var total = contracts.reduce(function(s, c) { return s + (c.total_current_cost || 0); }, 0);
-      var count = contracts.length;
-      var pors  = CONFIG.POR_OPTIONS;
 
       var cards = [
-        { label: 'Total Contracts', value: count, money: false },
-        { label: 'Total Portfolio Cost', value: total, money: true },
+        { label: 'Total Contracts', value: contracts.length, money: false }
       ];
+      cards.push({ label: 'Total Portfolio', value: total, money: true });
 
-      pors.forEach(function(por) {
+      CONFIG.POR_OPTIONS.forEach(function(por) {
         var subset = contracts.filter(function(c) {
-          return parsePOR(c.por_funded_by).indexOf(por) !== -1;
+          return (c.porFundedBy || []).indexOf(por) !== -1;
         });
-        var subtotal = subset.reduce(function(s, c) { return s + (c.total_current_cost || 0); }, 0);
-        cards.push({ label: por + ' Cost', value: subtotal, money: true, count: subset.length });
+        var sub = subset.reduce(function(s, c) { return s + (c.total_current_cost || 0); }, 0);
+        cards.push({ label: por, value: sub, money: true, count: subset.length });
       });
 
       bar.innerHTML = cards.map(function(card) {
-        var display;
-        if (!card.money) {
-          display = '<span class="value">' + card.value + '</span>';
-        } else if (isSU) {
-          display = '<span class="value">' + fmt(card.value) + '</span>';
-        } else {
-          display = '<span class="value redacted">Amount hidden</span>';
-        }
-        var sub = (card.count !== undefined) ? '<div style="font-size:10px;color:var(--text-muted);margin-top:2px">' + card.count + ' contract' + (card.count !== 1 ? 's' : '') + '</div>' : '';
+        var display = card.money
+          ? (isSU ? '<div class="value">' + fmt(card.value) + '</div>' : '<div class="value redacted">Amount hidden</div>')
+          : '<div class="value">' + card.value + '</div>';
+        var sub = (card.count !== undefined)
+          ? '<div class="sub">' + card.count + ' contract' + (card.count !== 1 ? 's' : '') + '</div>' : '';
         return '<div class="summary-card"><div class="label">' + card.label + '</div>' + display + sub + '</div>';
       }).join('');
     }
 
-    function buildPieChart(canvasId, labels, values, colors, isMoney) {
-      var ctx = document.getElementById(canvasId).getContext('2d');
-      var total = values.reduce(function(a, b) { return a + b; }, 0);
+    // ── PdM table ────────────────────────────────────────────────
 
-      new Chart(ctx, {
+    function buildPdmTable(contracts) {
+      var tbody = document.getElementById('pdmTbody');
+      tbody.innerHTML = contracts.map(function(c, idx) {
+        var porSupHtml = (c.porSupported || []).map(function(p) { return '<span class="por-tag">' + p + '</span>'; }).join('');
+        var porFundStr = (c.porFundedBy || []).join(', ') || '—';
+
+        var primaryMetric = '—';
+        if (c.lineItems && c.lineItems.length > 0) {
+          var pli = c.lineItems.find(function(li) { return li.id === c.primaryLineItemId; });
+          if (!pli) pli = c.lineItems.reduce(function(a, b) { return b.total > a.total ? b : a; });
+          if (pli && pli.metricType) {
+            primaryMetric = (pli.metricQuantity || pli.quantity || '') + ' ' + pli.metricType;
+          }
+        }
+
+        var rs = renewalStatusForContract(c);
+        var statusCell = rs
+          ? '<span class="status-badge badge-' + rs.cls + '">' + rs.lbl + '</span>'
+          : (c.renewalStatus ? '<span class="status-badge badge-green">' + c.renewalStatus + '</span>' : '—');
+        var rowCls = rs ? 'status-' + rs.cls : '';
+
+        return '<tr class="' + rowCls + '">' +
+          '<td class="row-num">' + (idx + 1) + '</td>' +
+          '<td><strong>' + c.deliveryOrderName + '</strong></td>' +
+          '<td class="muted">' + (c.deliveryOrderNumber || '—') + '</td>' +
+          '<td>' + porSupHtml + '</td>' +
+          '<td class="muted">' + porFundStr + '</td>' +
+          '<td class="muted">' + (c.vehicle || '—') + '</td>' +
+          '<td class="muted">' + UTILS.formatDate(c.popBeginDate) + '</td>' +
+          '<td class="muted">' + UTILS.formatDate(c.popEndDate) + '</td>' +
+          '<td class="muted">' + primaryMetric + '</td>' +
+          '<td>' + statusCell + '</td>' +
+          '<td class="muted">' + (c.notes || '—') + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    // ── BMD table ────────────────────────────────────────────────
+
+    function buildBmdTable(contracts) {
+      if (!isSU) {
+        document.getElementById('bmdRoleNote').textContent = ' Cost columns visible to superusers only.';
+      }
+      var tbody = document.getElementById('bmdTbody');
+      var sorted = contracts.slice().sort(function(a, b) {
+        return (b.total_current_cost || 0) - (a.total_current_cost || 0);
+      });
+      tbody.innerHTML = sorted.map(function(c, idx) {
+        var porFundHtml = (c.porFundedBy || []).map(function(p) { return '<span class="por-tag">' + p + '</span>'; }).join('') || '—';
+        var costs = c.costs || {};
+        var costCells = isSU
+          ? '<td class="cost-cell">'  + fmt(costs.ba8Portion      || 0) + '</td>' +
+            '<td class="cost-cell">'  + fmt(costs.arcyberPortion  || 0) + '</td>' +
+            '<td class="cost-cell muted">' + fmt(costs.itemsFee   || 0) + '</td>' +
+            '<td class="cost-cell muted">' + fmt(costs.gsaFee     || 0) + '</td>' +
+            '<td class="total-cell">' + fmt(costs.totalCurrentCost|| 0) + '</td>' +
+            '<td class="cost-cell">'  + fmt(costs.projectedNextFY || 0) + '</td>'
+          : '';
+        return '<tr>' +
+          '<td class="row-num">' + (idx + 1) + '</td>' +
+          '<td><strong>' + c.deliveryOrderName + '</strong></td>' +
+          '<td class="muted">' + (c.deliveryOrderNumber || '—') + '</td>' +
+          '<td>' + porFundHtml + '</td>' +
+          costCells +
+          '<td class="muted">' + UTILS.formatDate(c.popEndDate) + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    // ── Visualization ────────────────────────────────────────────
+
+    function buildPieChart(canvasId, labels, values, colors, showMoney) {
+      var ctx = document.getElementById(canvasId);
+      if (!ctx) return;
+      var total = values.reduce(function(a, b) { return a + b; }, 0);
+      new Chart(ctx.getContext('2d'), {
         type: 'pie',
         data: {
           labels: labels,
-          datasets: [{
-            data: values,
-            backgroundColor: colors,
-            borderColor: '#1a1f1a',
-            borderWidth: 2
-          }]
+          datasets: [{ data: values, backgroundColor: colors, borderColor: '#1a1f1a', borderWidth: 2 }]
         },
         options: {
           responsive: true,
@@ -291,13 +356,11 @@
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: function(ctx) {
-                  var pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : '0.0';
-                  if (isMoney) {
-                    return ' ' + ctx.label + ': ' + fmt(ctx.parsed) + ' (' + pct + '%)';
-                  } else {
-                    return ' ' + ctx.label + ' (' + pct + '%)';
-                  }
+                label: function(ci) {
+                  var pct = total > 0 ? ((ci.parsed / total) * 100).toFixed(1) : '0.0';
+                  return showMoney
+                    ? ' ' + ci.label + ': ' + fmt(ci.parsed) + ' (' + pct + '%)'
+                    : ' ' + ci.label + ' (' + pct + '%)';
                 }
               }
             }
@@ -306,73 +369,48 @@
       });
     }
 
-    function buildLegendTable(container, labels, values, colors, isMoney) {
+    function buildLegendTable(container, labels, values, colors, showMoney) {
       var total = values.reduce(function(a, b) { return a + b; }, 0);
-      var rows = labels.map(function(lbl, i) {
-        var pct = total > 0 ? ((values[i] / total) * 100).toFixed(1) : '0.0';
-        var valCell = isMoney
-          ? '<td class="legend-value">' + fmt(values[i]) + '</td>'
-          : '';
-        return '<tr>' +
-          '<td><span class="legend-swatch" style="background:' + colors[i] + '"></span>' +
-          '<span class="legend-name">' + lbl + '</span></td>' +
-          valCell +
-          '<td class="legend-pct">' + pct + '%</td>' +
-        '</tr>';
-      }).join('');
-
       var tbl = document.createElement('table');
       tbl.className = 'legend-table';
-      tbl.innerHTML = rows;
+      tbl.innerHTML = labels.map(function(lbl, i) {
+        var pct = total > 0 ? ((values[i] / total) * 100).toFixed(1) : '0.0';
+        var valCell = showMoney ? '<td class="legend-value">' + fmt(values[i]) + '</td>' : '';
+        return '<tr>' +
+          '<td><span class="legend-swatch" style="background:' + colors[i] + '"></span><span class="legend-name">' + lbl + '</span></td>' +
+          valCell +
+          '<td class="legend-pct">' + pct + '%</td></tr>';
+      }).join('');
       container.appendChild(tbl);
     }
 
     function buildMasterChart(contracts) {
       var container = document.getElementById('masterChartContainer');
       container.innerHTML = '';
-
-      var active = contracts.filter(function(c) { return (c.total_current_cost || 0) > 0; });
-      active.sort(function(a, b) { return b.total_current_cost - a.total_current_cost; });
-
+      var active = contracts.filter(function(c) { return (c.total_current_cost || 0) > 0; })
+        .sort(function(a, b) { return b.total_current_cost - a.total_current_cost; });
       if (active.length === 0) {
         container.innerHTML = '<div class="chart-card master-chart-card"><div class="no-data-msg">No cost data available.</div></div>';
         return;
       }
-
-      var labels = active.map(function(c) { return c.delivery_order_name; });
+      var labels = active.map(function(c) { return c.deliveryOrderName; });
       var values = active.map(function(c) { return c.total_current_cost; });
       var colors = active.map(function(_, i) { return PALETTE[i % PALETTE.length]; });
       var total  = values.reduce(function(a, b) { return a + b; }, 0);
 
       var card = document.createElement('div');
       card.className = 'chart-card master-chart-card';
-
-      var title = document.createElement('div');
-      title.className = 'chart-card-title';
-      title.textContent = 'All Delivery Orders';
-
-      var sub = document.createElement('div');
-      sub.className = 'chart-card-subtitle';
-      sub.textContent = active.length + ' contracts' + (isSU ? ' — Total: ' + fmt(total) : '');
+      card.innerHTML = '<div class="chart-card-title">All Delivery Orders</div>' +
+        '<div class="chart-card-subtitle">' + active.length + ' contracts' + (isSU ? ' — Total: ' + fmt(total) : '') + '</div>';
 
       var inner = document.createElement('div');
-      inner.style.display = 'flex';
-      inner.style.gap = '24px';
-      inner.style.flexWrap = 'wrap';
-      inner.style.alignItems = 'flex-start';
-
+      inner.style.cssText = 'display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start';
       var wrapDiv = document.createElement('div');
       wrapDiv.className = 'chart-wrapper';
-      var canvas = document.createElement('canvas');
-      canvas.id = 'chart-master';
-      wrapDiv.appendChild(canvas);
-
+      wrapDiv.innerHTML = '<canvas id="chart-master"></canvas>';
       var legendDiv = document.createElement('div');
-      legendDiv.style.flex = '1';
-      legendDiv.style.minWidth = '200px';
+      legendDiv.style.cssText = 'flex:1;min-width:200px';
 
-      card.appendChild(title);
-      card.appendChild(sub);
       inner.appendChild(wrapDiv);
       inner.appendChild(legendDiv);
       card.appendChild(inner);
@@ -385,68 +423,126 @@
     function buildPORCharts(contracts) {
       var container = document.getElementById('porChartsContainer');
       container.innerHTML = '';
-
       CONFIG.POR_OPTIONS.forEach(function(por, porIdx) {
         var subset = contracts.filter(function(c) {
-          return parsePOR(c.por_funded_by).indexOf(por) !== -1 && (c.total_current_cost || 0) > 0;
-        });
-
-        subset.sort(function(a, b) { return b.total_current_cost - a.total_current_cost; });
+          return (c.porFundedBy || []).indexOf(por) !== -1 && (c.total_current_cost || 0) > 0;
+        }).sort(function(a, b) { return b.total_current_cost - a.total_current_cost; });
 
         var card = document.createElement('div');
         card.className = 'chart-card';
-
-        var title = document.createElement('div');
-        title.className = 'chart-card-title';
-        title.textContent = por;
-
-        card.appendChild(title);
+        card.innerHTML = '<div class="chart-card-title">' + por + '</div>';
 
         if (subset.length === 0) {
-          var msg = document.createElement('div');
-          msg.className = 'no-data-msg';
-          msg.textContent = 'No contracts in this POR.';
-          card.appendChild(msg);
+          card.innerHTML += '<div class="no-data-msg">No contracts in this POR.</div>';
           container.appendChild(card);
           return;
         }
 
-        var labels = subset.map(function(c) { return c.delivery_order_name; });
+        var labels = subset.map(function(c) { return c.deliveryOrderName; });
         var values = subset.map(function(c) { return c.total_current_cost; });
         var colors = subset.map(function(_, i) { return PALETTE[i % PALETTE.length]; });
         var total  = values.reduce(function(a, b) { return a + b; }, 0);
 
-        var sub = document.createElement('div');
-        sub.className = 'chart-card-subtitle';
-        sub.textContent = subset.length + ' contract' + (subset.length !== 1 ? 's' : '') +
-          (isSU ? ' — ' + fmt(total) : '');
-        card.appendChild(sub);
+        card.innerHTML += '<div class="chart-card-subtitle">' +
+          subset.length + ' contract' + (subset.length !== 1 ? 's' : '') +
+          (isSU ? ' — ' + fmt(total) : '') + '</div>';
 
         var canvasId = 'chart-por-' + porIdx;
         var wrapDiv = document.createElement('div');
         wrapDiv.className = 'chart-wrapper';
-        var canvas = document.createElement('canvas');
-        canvas.id = canvasId;
-        wrapDiv.appendChild(canvas);
+        wrapDiv.innerHTML = '<canvas id="' + canvasId + '"></canvas>';
         card.appendChild(wrapDiv);
-
         buildLegendTable(card, labels, values, colors, isSU);
         container.appendChild(card);
 
-        // Build chart after DOM insertion so canvas is sized
-        requestAnimationFrame(function() {
-          buildPieChart(canvasId, labels, values, colors, isSU);
-        });
+        requestAnimationFrame(function() { buildPieChart(canvasId, labels, values, colors, isSU); });
       });
     }
 
+    // ── Export helpers ───────────────────────────────────────────
+
+    function xlsxDownload(wb, filename) {
+      XLSX.writeFile(wb, filename);
+    }
+
     var BUDGET = {
+
+      switchTab: function(name) {
+        ['pdm','bmd','viz'].forEach(function(t) {
+          document.getElementById('tab-' + t).classList.toggle('active', t === name);
+          document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === name);
+        });
+      },
+
+      exportPdm: function() {
+        if (typeof XLSX === 'undefined') { alert('Export library not loaded.'); return; }
+        var rows = [['#','Delivery Order Name','DO #','POR(s) Supported','POR Funded By','Vehicle','PoP Begin','PoP End','Primary Metric','Renewal Status','Notes']];
+        allContracts.forEach(function(c, i) {
+          var primaryMetric = '—';
+          if (c.lineItems && c.lineItems.length > 0) {
+            var pli = c.lineItems.find(function(li) { return li.id === c.primaryLineItemId; });
+            if (!pli) pli = c.lineItems.reduce(function(a, b) { return b.total > a.total ? b : a; });
+            if (pli && pli.metricType) primaryMetric = (pli.metricQuantity || pli.quantity || '') + ' ' + pli.metricType;
+          }
+          var rs = renewalStatusForContract(c);
+          rows.push([
+            i + 1,
+            c.deliveryOrderName,
+            c.deliveryOrderNumber || '',
+            (c.porSupported || []).join('; '),
+            (c.porFundedBy  || []).join('; '),
+            c.vehicle || '',
+            c.popBeginDate || '',
+            c.popEndDate   || '',
+            primaryMetric,
+            rs ? rs.lbl : (c.renewalStatus || ''),
+            c.notes || ''
+          ]);
+        });
+        var ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = rows[0].map(function(h) { return { wch: Math.max(String(h).length + 4, 14) }; });
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'PdM View');
+        xlsxDownload(wb, 'dco-pdm-view-' + new Date().toISOString().slice(0,10) + '.xlsx');
+      },
+
+      exportBmd: function() {
+        if (typeof XLSX === 'undefined') { alert('Export library not loaded.'); return; }
+        var headers = ['#','Delivery Order Name','DO #','POR Funded By'];
+        if (isSU) headers = headers.concat(['BA8 Portion ($)','ARCYBER Portion ($)','ITEMS Fee ($)','GSA Fee ($)','Total Current Cost ($)','Projected Next FY ($)']);
+        headers.push('PoP End');
+        var rows = [headers];
+        var sorted = allContracts.slice().sort(function(a, b) { return (b.total_current_cost || 0) - (a.total_current_cost || 0); });
+        sorted.forEach(function(c, i) {
+          var costs = c.costs || {};
+          var row = [
+            i + 1,
+            c.deliveryOrderName,
+            c.deliveryOrderNumber || '',
+            (c.porFundedBy || []).join('; ')
+          ];
+          if (isSU) row = row.concat([
+            costs.ba8Portion || 0,
+            costs.arcyberPortion || 0,
+            costs.itemsFee || 0,
+            costs.gsaFee || 0,
+            costs.totalCurrentCost || 0,
+            costs.projectedNextFY || 0
+          ]);
+          row.push(c.popEndDate || '');
+          rows.push(row);
+        });
+        var ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = headers.map(function(h) { return { wch: Math.max(String(h).length + 4, 14) }; });
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'BMD View');
+        xlsxDownload(wb, 'dco-bmd-view-' + new Date().toISOString().slice(0,10) + '.xlsx');
+      },
+
       init: async function() {
         var session = AUTH.requireAuth();
         if (!session) return;
-
         isSU = session.role === 'superuser';
-
         document.getElementById('navUsername').textContent  = session.username;
         document.getElementById('navRoleBadge').textContent = isSU ? 'Superuser' : 'User';
         document.getElementById('logoutBtn').addEventListener('click', function() { AUTH.logout(); });
@@ -458,6 +554,8 @@
         try {
           allContracts = await API.getContracts();
           buildSummary(allContracts);
+          buildPdmTable(allContracts);
+          buildBmdTable(allContracts);
           buildMasterChart(allContracts);
           buildPORCharts(allContracts);
         } catch(e) {

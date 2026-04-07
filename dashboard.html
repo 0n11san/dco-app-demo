@@ -49,12 +49,11 @@
     <div class="page-header">
       <div class="page-title">Active Contracts &nbsp;<span id="contractCount" class="text-muted" style="font-size:11px;font-weight:400;letter-spacing:0"></span></div>
       <div class="controls-bar">
-        <label class="btn btn-outline btn-sm su-only" style="cursor:pointer" title="Upload CSV or Excel to bulk-update contracts">
-          UPLOAD CSV/XLSX
-          <input type="file" id="uploadInput" accept=".csv,.xlsx,.xls" style="display:none">
+        <label class="btn btn-outline btn-sm su-only" style="cursor:pointer" title="Upload Excel file to bulk-update contracts">
+          UPLOAD XLSX
+          <input type="file" id="uploadInput" accept=".xlsx,.xls" style="display:none">
         </label>
         <button class="btn btn-primary btn-sm su-only" id="btnAddContract">+ ADD CONTRACT</button>
-        <button class="btn btn-outline btn-sm" id="btnExportCSV">EXPORT CSV</button>
         <button class="btn btn-outline btn-sm" id="btnExportExcel">EXPORT EXCEL</button>
       </div>
     </div>
@@ -83,6 +82,7 @@
             <th data-tooltip="Primary performance metric for this delivery order (e.g., number of endpoints, seats, or cores licensed)">Primary Metric</th>
             <th data-tooltip="Period of Performance begin date">PoP Begin</th>
             <th data-tooltip="Period of Performance end date">PoP End</th>
+            <th data-tooltip="Renewal urgency status based on suspense deadline (45 days before PoP end)">Status</th>
             <th class="su-only" style="width:50px"></th>
           </tr>
         </thead>

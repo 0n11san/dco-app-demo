@@ -17,9 +17,6 @@ const DASHBOARD = {
       el.classList.toggle('hidden', !isSU);
     });
 
-    document.getElementById('btnExportCSV').addEventListener('click', function() {
-      EXPORT.toCSV(DASHBOARD.contracts, isSU);
-    });
     document.getElementById('btnExportExcel').addEventListener('click', function() {
       EXPORT.toExcel(DASHBOARD.contracts, isSU);
     });
@@ -57,6 +54,21 @@ const DASHBOARD = {
     } finally {
       this.showLoading(false);
     }
+  },
+
+  _renewalStatus: function(c) {
+    if (!c.popEndDate) return null;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const end = new Date(c.popEndDate + 'T12:00:00');
+    const daysUntilEnd = Math.ceil((end - today) / 86400000);
+    if (daysUntilEnd > CONFIG.RENEWAL_WINDOW) return null;
+    const suspDate = new Date(end);
+    suspDate.setDate(suspDate.getDate() - CONFIG.RENEWAL_LEAD_TIME);
+    const daysUntilSusp = Math.ceil((suspDate - today) / 86400000);
+    if (daysUntilSusp <= 0)  return { cls:'overdue', lbl:'OVERDUE' };
+    if (daysUntilSusp <= 14) return { cls:'red',     lbl:'CRITICAL' };
+    if (daysUntilSusp <= 30) return { cls:'yellow',  lbl:'WARNING' };
+    return { cls:'green', lbl:'MONITOR' };
   },
 
   render: function() {
@@ -112,6 +124,9 @@ const DASHBOARD = {
         '<td class="muted">' + primaryMetric + '</td>' +
         '<td class="muted">' + UTILS.formatDate(c.popBeginDate) + '</td>' +
         '<td class="muted">' + UTILS.formatDate(c.popEndDate) + '</td>';
+
+      const rs = DASHBOARD._renewalStatus(c);
+      row += '<td>' + (rs ? '<span class="status-badge badge-' + rs.cls + '">' + rs.lbl + '</span>' : '—') + '</td>';
 
       if (isSU) {
         row += '<td onclick="event.stopPropagation()">' +
