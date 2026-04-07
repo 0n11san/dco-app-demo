@@ -184,8 +184,11 @@ const DASHBOARD = {
 
 const DETAIL = {
   open: function(idOrContract) {
+    const allContracts = (DASHBOARD.contracts && DASHBOARD.contracts.length)
+      ? DASHBOARD.contracts
+      : (typeof RENEWAL !== 'undefined' ? RENEWAL.contracts : []);
     const contract = typeof idOrContract === 'string'
-      ? DASHBOARD.contracts.find(function(c) { return c.id === idOrContract; })
+      ? allContracts.find(function(c) { return c.id === idOrContract; })
       : idOrContract;
     if (!contract) return;
 

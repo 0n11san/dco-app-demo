@@ -147,7 +147,6 @@ const RENEWAL_MODAL = {
     // Reset form
     document.getElementById('renewalForm').reset();
     document.getElementById('renewalAlert').className = 'alert';
-    document.getElementById('renewalAction').value = '';
 
     document.getElementById('renewalOverlay').classList.add('active');
   },
