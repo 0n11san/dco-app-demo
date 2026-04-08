@@ -151,7 +151,7 @@ const RENEWAL_MODAL = {
     } else {
       liHtml = '<table style="width:100%;border-collapse:collapse;font-size:12px">' +
         '<thead><tr>' +
-          '<th style="text-align:left;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em">Description</th>' +
+          '<th style="text-align:left;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em">SKU Description</th>' +
           '<th style="text-align:right;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em">Qty</th>' +
           '<th style="padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em">Metric</th>' +
         '</tr></thead><tbody>' +

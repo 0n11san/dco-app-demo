@@ -74,12 +74,11 @@
 
   <nav class="navbar" style="position:relative">
     <a href="landing.html" class="navbar-brand" style="text-decoration:none;color:var(--gold)"><span class="star">&#9733;</span> DCO CMS</a>
-    <div class="navbar-center">BUDGET OVERVIEW</div>
     <div class="navbar-right">
       <a href="dashboard.html" class="btn btn-outline btn-sm">CONTRACT DASHBOARD</a>
       <a href="renewal.html" class="btn btn-outline btn-sm">RENEWAL TRACKER</a>
       <a href="priorities.html" class="btn btn-outline btn-sm">ARCYBER PRIORITIES</a>
-      <a href="budget.html" class="btn btn-outline btn-sm">BUDGET OVERVIEW</a>
+      <a href="budget.html" class="btn btn-outline btn-sm btn-nav-active">BUDGET OVERVIEW</a>
       <a href="audit-log.html" class="btn btn-outline btn-sm su-only">ACTIVITY LOG</a>
       <a href="email-demo.html" class="btn btn-outline btn-sm su-only">EMAIL DEMO</a>
       <span id="navUsername" class="text-muted" style="font-size:12px"></span>
@@ -153,7 +152,9 @@
         <div>
           <div class="view-title">BMD View — Budget &amp; Cost Summary</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px">
-            Columns will be refined once Bridgett's format is provided.
+            Cost overview sorted by total spend. <strong style="color:var(--gold)">EXPORT EXCEL</strong>
+            produces the full BMD payment schedule — one column per fiscal month half (Oct H1 … Sep H2),
+            with each DO's dollar amount placed in the month that is 45 days before its PoP begin date.
             <span id="bmdRoleNote"></span>
           </div>
         </div>
@@ -203,10 +204,10 @@
     Chart.defaults.font.size = 11;
 
     var PALETTE = [
-      '#4a7c59','#c8a951','#6b9e7a','#e0c068','#3a6048',
-      '#a08830','#88b898','#f0d888','#2a4830','#807020',
-      '#b0d0b8','#d8b848','#5a8c6a','#b09840','#78ae88',
-      '#c0a840','#9abcaa','#e8c858','#3a5840','#907828'
+      '#4a90d9','#e74c3c','#2ecc71','#f39c12','#9b59b6',
+      '#1abc9c','#e91e63','#00bcd4','#ff5722','#8bc34a',
+      '#673ab7','#ff9800','#03a9f4','#4db6ac','#ef5350',
+      '#7e57c2','#26c6da','#66bb6a','#ffa726','#ab47bc'
     ];
 
     var isSU = false;
@@ -519,35 +520,81 @@
 
       exportBmd: function() {
         if (typeof XLSX === 'undefined') { alert('Export library not loaded.'); return; }
-        var headers = ['#','Delivery Order Name','DO #','POR Funded By'];
-        if (isSU) headers = headers.concat(['BA8 Portion ($)','ARCYBER Portion ($)','ITEMS Fee ($)','GSA Fee ($)','Total Current Cost ($)','Projected Next FY ($)']);
-        headers.push('PoP End');
-        var rows = [headers];
-        var sorted = allContracts.slice().sort(function(a, b) { return cost(b) - cost(a); });
-        sorted.forEach(function(c, i) {
-          var costs = c.costs || {};
-          var row = [
-            i + 1,
-            c.deliveryOrderName,
-            c.deliveryOrderNumber || '',
-            (c.porFundedBy || []).join('; ')
-          ];
-          if (isSU) row = row.concat([
-            costs.ba8Portion || 0,
-            costs.arcyberPortion || 0,
-            costs.itemsFee || 0,
-            costs.gsaFee || 0,
-            costs.totalCurrentCost || 0,
-            costs.projectedNextFY || 0
-          ]);
-          row.push(c.popEndDate || '');
-          rows.push(row);
-        });
+
+        // Government FY: Oct–Sep. FY year = the year Sep falls in.
+        var now = new Date();
+        var fyYear = (now.getMonth() >= 9) ? now.getFullYear() + 1 : now.getFullYear();
+        // FY month order (0-indexed): Oct=0, Nov=1, Dec=2, Jan=3, Feb=4, Mar=5,
+        //                             Apr=6, May=7, Jun=8, Jul=9, Aug=10, Sep=11
+        var calToFY = [3,4,5,6,7,8,9,10,11,0,1,2]; // calToFY[calMonth] = fyMonthIdx
+
+        var monthNames = ['OCT','NOV','DEC','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP'];
+        var monthCols = [];
+        monthNames.forEach(function(m) { monthCols.push(m+'-H1'); monthCols.push(m+'-H2'); });
+
+        // Header row
+        var hdr = ['DO Name','DO #','PoP Begin','PoP End'].concat(monthCols).concat(['Total $']);
+        var rows = [hdr];
+        var N = hdr.length;
+        var colTotals = new Array(N).fill(0);
+
+        allContracts
+          .filter(function(c) { return c.deliveryOrderName && c.deliveryOrderName !== 'Test_Contract'; })
+          .forEach(function(c) {
+            var row = new Array(N).fill('');
+            row[0] = c.deliveryOrderName;
+            row[1] = c.deliveryOrderNumber || '';
+            row[2] = c.popBeginDate || '';
+            row[3] = c.popEndDate   || '';
+
+            if (c.popBeginDate) {
+              // Trigger date = 45 days before PoP begin
+              var trigger = new Date(c.popBeginDate + 'T12:00:00');
+              trigger.setDate(trigger.getDate() - 45);
+
+              var tYear = trigger.getFullYear();
+              var tMon  = trigger.getMonth(); // 0=Jan
+              // Is trigger within this FY?  FY start = Oct 1 of fyYear-1, end = Sep 30 of fyYear
+              var inFY = (tYear === fyYear - 1 && tMon >= 9) || (tYear === fyYear && tMon <= 8);
+
+              if (inFY) {
+                var fyIdx = calToFY[tMon];          // 0–11
+                var half  = trigger.getDate() <= 15 ? 0 : 1;
+                var colIdx = 4 + fyIdx * 2 + half;  // 4 fixed cols before month cols
+                var amt = cost(c);
+                row[colIdx]  = amt;
+                row[N - 1]   = amt; // Total $
+                colTotals[colIdx] += amt;
+                colTotals[N - 1]  += amt;
+              }
+            }
+            rows.push(row);
+          });
+
+        // Grand total row
+        var totRow = new Array(N).fill('');
+        totRow[0] = 'GRAND TOTAL';
+        for (var ci = 4; ci < N; ci++) { if (colTotals[ci]) totRow[ci] = colTotals[ci]; }
+        rows.push(totRow);
+
         var ws = XLSX.utils.aoa_to_sheet(rows);
-        ws['!cols'] = headers.map(function(h) { return { wch: Math.max(String(h).length + 4, 14) }; });
+        // Column widths
+        ws['!cols'] = [{ wch:38 },{ wch:20 },{ wch:12 },{ wch:12 }]
+          .concat(monthCols.map(function() { return { wch:10 }; }))
+          .concat([{ wch:14 }]);
+
+        // Bold header + total rows
+        var range = XLSX.utils.decode_range(ws['!ref']);
+        [0, rows.length - 1].forEach(function(r) {
+          for (var cc = range.s.c; cc <= range.e.c; cc++) {
+            var cell = ws[XLSX.utils.encode_cell({ r:r, c:cc })];
+            if (cell) cell.s = { font:{ bold:true } };
+          }
+        });
+
         var wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'BMD View');
-        xlsxDownload(wb, 'dco-bmd-view-' + new Date().toISOString().slice(0,10) + '.xlsx');
+        XLSX.utils.book_append_sheet(wb, ws, 'BMD FY' + fyYear);
+        xlsxDownload(wb, 'dco-bmd-fy' + fyYear + '-' + new Date().toISOString().slice(0,10) + '.xlsx');
       },
 
       init: async function() {

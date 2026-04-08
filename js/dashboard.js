@@ -95,9 +95,15 @@ const DASHBOARD = {
         ? '<span class="user-badge" style="background:' + (c.renewalStatus === 'RENEW' ? 'var(--green-text)' : 'var(--red-text)') + ';margin-left:4px">' + c.renewalStatus + '</span>'
         : '';
 
+      const capPreview = c.capabilityDescription
+        ? '<div style="font-size:10px;color:var(--text-muted);margin-top:2px;max-width:280px;white-space:normal;line-height:1.4">' +
+          (c.capabilityDescription.length > 110 ? c.capabilityDescription.slice(0,110) + '…' : c.capabilityDescription) +
+          '</div>'
+        : '';
+
       let row = '<tr data-id="' + c.id + '" onclick="DETAIL.open(\'' + c.id + '\')">' +
         '<td class="row-num">' + (idx + 1) + '</td>' +
-        '<td><strong>' + c.deliveryOrderName + '</strong>' + renewalBadge + '</td>' +
+        '<td><strong>' + c.deliveryOrderName + '</strong>' + renewalBadge + capPreview + '</td>' +
         '<td class="muted">' + c.deliveryOrderNumber + '</td>';
 
       if (isSU) {
@@ -258,7 +264,7 @@ const DETAIL = {
       let liHtml = '';
       if (li.length > 0) {
         liHtml = '<table class="cost-summary-table" style="margin-bottom:12px"><thead><tr>' +
-          '<th style="text-align:left;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase">Description</th>' +
+          '<th style="text-align:left;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase">SKU Description</th>' +
           '<th style="text-align:right;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase">Qty</th>' +
           '<th style="text-align:right;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase">Unit Cost</th>' +
           '<th style="text-align:right;padding:5px 8px;background:var(--table-header);color:var(--text-muted);font-size:10px;text-transform:uppercase">Total</th>' +

@@ -157,6 +157,7 @@ a:hover { text-decoration: underline; }
 }
 
 .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-nav-active { border-color: var(--gold) !important; color: var(--gold) !important; }
 
 .btn-sm { padding: 3px 8px; font-size: 11px; }
 
