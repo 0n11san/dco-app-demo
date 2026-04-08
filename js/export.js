@@ -16,20 +16,22 @@ const EXPORT = {
     { key: 'gsaFee',              label: 'GSA Fee 2% ($)' },
     { key: 'totalCurrentCost',    label: 'Total Current Cost ($)' },
     { key: 'projectedNextFY',     label: 'Projected Next FY ($)' },
-    { key: 'por',                 label: 'POR(s)' },
-    { key: 'popBeginDate',        label: 'PoP Begin' },
-    { key: 'popEndDate',          label: 'PoP End' },
-    { key: 'notes',               label: 'Notes' }
+    { key: 'por',                    label: 'POR(s)' },
+    { key: 'popBeginDate',           label: 'PoP Begin' },
+    { key: 'popEndDate',             label: 'PoP End' },
+    { key: 'capabilityDescription',  label: 'Capability Description' },
+    { key: 'notes',                  label: 'Notes' }
   ],
 
   // Columns available to regular users
   REGULAR_COLS: [
-    { key: 'rowNum',              label: '#' },
-    { key: 'deliveryOrderName',   label: 'Delivery Order Name' },
-    { key: 'deliveryOrderNumber', label: 'DO #' },
-    { key: 'por',                 label: 'POR(s)' },
-    { key: 'popBeginDate',        label: 'PoP Begin' },
-    { key: 'popEndDate',          label: 'PoP End' }
+    { key: 'rowNum',                 label: '#' },
+    { key: 'deliveryOrderName',      label: 'Delivery Order Name' },
+    { key: 'deliveryOrderNumber',    label: 'DO #' },
+    { key: 'por',                    label: 'POR(s)' },
+    { key: 'popBeginDate',           label: 'PoP Begin' },
+    { key: 'popEndDate',             label: 'PoP End' },
+    { key: 'capabilityDescription',  label: 'Capability Description' }
   ],
 
   // Extract a flat row object from a contract
@@ -47,10 +49,11 @@ const EXPORT = {
       gsaFee:              contract.costs.gsaFee,
       totalCurrentCost:    contract.costs.totalCurrentCost,
       projectedNextFY:     contract.costs.projectedNextFY,
-      por:                 (contract.porSupported || contract.por || []).join('; '),
-      popBeginDate:        contract.popBeginDate,
-      popEndDate:          contract.popEndDate,
-      notes:               contract.notes || ''
+      por:                    (contract.porSupported || contract.por || []).join('; '),
+      popBeginDate:           contract.popBeginDate,
+      popEndDate:             contract.popEndDate,
+      capabilityDescription:  contract.capabilityDescription || '',
+      notes:                  contract.notes || ''
     };
   },
 

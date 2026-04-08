@@ -121,7 +121,7 @@
         <div>
           <div class="view-title">PdM View — Delivery Order Summary</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px">
-            Columns will be refined once Sok's format is provided.
+            Columns will be refined once Sok's format is provided. Cost columns visible to superusers only.
           </div>
         </div>
         <button class="btn btn-outline btn-sm" onclick="BUDGET.exportPdm()">EXPORT EXCEL</button>
@@ -137,6 +137,12 @@
             <th>Vehicle</th>
             <th>PoP Begin</th>
             <th>PoP End</th>
+            <th class="su-only text-right">BA8 Portion</th>
+            <th class="su-only text-right">ARCYBER Portion</th>
+            <th class="su-only text-right">ITEMS Fee (1%)</th>
+            <th class="su-only text-right">GSA Fee (2%)</th>
+            <th class="su-only text-right">Total Current Cost</th>
+            <th class="su-only text-right">Projected Next FY</th>
             <th>Primary Metric</th>
             <th>Renewal Status</th>
             <th>Notes</th>
@@ -150,31 +156,17 @@
     <div class="tab-content" id="tab-bmd">
       <div class="view-header">
         <div>
-          <div class="view-title">BMD View — Budget &amp; Cost Summary</div>
+          <div class="view-title">BMD View — FY Payment Schedule</div>
           <div style="font-size:10px;color:var(--text-muted);margin-top:3px">
-            Cost overview sorted by total spend. <strong style="color:var(--gold)">EXPORT EXCEL</strong>
-            produces the full BMD payment schedule — one column per fiscal month half (Oct H1 … Sep H2),
-            with each DO's dollar amount placed in the month that is 45 days before its PoP begin date.
+            Dollar amount placed in the column 45 days before each DO's PoP begin date (Gov't FY: Oct–Sep).
             <span id="bmdRoleNote"></span>
           </div>
         </div>
         <button class="btn btn-outline btn-sm" onclick="BUDGET.exportBmd()">EXPORT EXCEL</button>
       </div>
       <div class="table-wrapper">
-        <table id="bmdTable">
-          <thead><tr>
-            <th style="width:32px">#</th>
-            <th>Delivery Order Name</th>
-            <th>DO #</th>
-            <th>POR Funded By</th>
-            <th class="su-only text-right">BA8 Portion</th>
-            <th class="su-only text-right">ARCYBER Portion</th>
-            <th class="su-only text-right">ITEMS Fee (1%)</th>
-            <th class="su-only text-right">GSA Fee (2%)</th>
-            <th class="su-only text-right">Total Current Cost</th>
-            <th class="su-only text-right">Projected Next FY</th>
-            <th>PoP End</th>
-          </tr></thead>
+        <table id="bmdTable" style="font-size:11px">
+          <thead id="bmdThead"></thead>
           <tbody id="bmdTbody"></tbody>
         </table>
       </div>
@@ -182,6 +174,11 @@
 
     <!-- ── Visualization ─────────────────────────────────── -->
     <div class="tab-content" id="tab-viz">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)">Color scheme:</span>
+        <button id="paletteArmyBtn" class="btn btn-gold btn-sm" onclick="BUDGET.setPalette('army')">Army</button>
+        <button id="paletteFullBtn" class="btn btn-outline btn-sm" onclick="BUDGET.setPalette('full')">Full Color</button>
+      </div>
       <div class="section-heading">Total Portfolio</div>
       <div class="charts-grid" id="masterChartContainer"></div>
       <div class="section-heading">By Program of Record (POR Funded By)</div>
@@ -203,12 +200,20 @@
     Chart.defaults.font.family = "'Courier New', Courier, monospace";
     Chart.defaults.font.size = 11;
 
-    var PALETTE = [
+    var ARMY_PALETTE = [
+      '#4a7c59','#c8a951','#6b9e7a','#e0c068','#3a6048',
+      '#a08830','#88b898','#f0d888','#2a4830','#807020',
+      '#b0d0b8','#d8b848','#5a8c6a','#b09840','#78ae88',
+      '#c0a840','#9abcaa','#e8c858','#3a5840','#907828'
+    ];
+    var FULL_PALETTE = [
       '#4a90d9','#e74c3c','#2ecc71','#f39c12','#9b59b6',
       '#1abc9c','#e91e63','#00bcd4','#ff5722','#8bc34a',
       '#673ab7','#ff9800','#03a9f4','#4db6ac','#ef5350',
       '#7e57c2','#26c6da','#66bb6a','#ffa726','#ab47bc'
     ];
+    var PALETTE = ARMY_PALETTE; // default: army
+    var chartInstances = {};
 
     var isSU = false;
     var allContracts = [];
@@ -293,6 +298,16 @@
           : (c.renewalStatus ? '<span class="status-badge badge-green">' + c.renewalStatus + '</span>' : '—');
         var rowCls = rs ? 'status-' + rs.cls : '';
 
+        var costs = c.costs || {};
+        var costCells = isSU
+          ? '<td class="cost-cell su-only">' + fmt(costs.ba8Portion       || 0) + '</td>' +
+            '<td class="cost-cell su-only">' + fmt(costs.arcyberPortion   || 0) + '</td>' +
+            '<td class="cost-cell muted su-only">' + fmt(costs.itemsFee   || 0) + '</td>' +
+            '<td class="cost-cell muted su-only">' + fmt(costs.gsaFee     || 0) + '</td>' +
+            '<td class="total-cell su-only">' + fmt(costs.totalCurrentCost|| 0) + '</td>' +
+            '<td class="cost-cell su-only">' + fmt(costs.projectedNextFY  || 0) + '</td>'
+          : '';
+
         return '<tr class="' + rowCls + '">' +
           '<td class="row-num">' + (idx + 1) + '</td>' +
           '<td><strong>' + c.deliveryOrderName + '</strong></td>' +
@@ -302,43 +317,90 @@
           '<td class="muted">' + (c.vehicle || '—') + '</td>' +
           '<td class="muted">' + UTILS.formatDate(c.popBeginDate) + '</td>' +
           '<td class="muted">' + UTILS.formatDate(c.popEndDate) + '</td>' +
+          costCells +
           '<td class="muted">' + primaryMetric + '</td>' +
           '<td>' + statusCell + '</td>' +
-          '<td class="muted">' + (c.notes || '—') + '</td>' +
+          '<td class="muted" style="max-width:200px;white-space:normal">' + (c.notes || '') + '</td>' +
         '</tr>';
       }).join('');
     }
 
-    // ── BMD table ────────────────────────────────────────────────
+    // ── BMD table (payment schedule, mirrors export) ─────────────
+
+    function bmdFYSetup() {
+      var now = new Date();
+      var fyYear = (now.getMonth() >= 9) ? now.getFullYear() + 1 : now.getFullYear();
+      var calToFY = [3,4,5,6,7,8,9,10,11,0,1,2];
+      var monthNames = ['OCT','NOV','DEC','JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP'];
+      var monthCols = [];
+      monthNames.forEach(function(m) { monthCols.push(m+'-H1'); monthCols.push(m+'-H2'); });
+      return { fyYear:fyYear, calToFY:calToFY, monthCols:monthCols };
+    }
 
     function buildBmdTable(contracts) {
-      if (!isSU) {
-        document.getElementById('bmdRoleNote').textContent = ' Cost columns visible to superusers only.';
-      }
-      var tbody = document.getElementById('bmdTbody');
-      var sorted = contracts.slice().sort(function(a, b) {
-        return cost(b) - cost(a);
-      });
-      tbody.innerHTML = sorted.map(function(c, idx) {
-        var porFundHtml = (c.porFundedBy || []).map(function(p) { return '<span class="por-tag">' + p + '</span>'; }).join('') || '—';
-        var costs = c.costs || {};
-        var costCells = isSU
-          ? '<td class="cost-cell">'  + fmt(costs.ba8Portion      || 0) + '</td>' +
-            '<td class="cost-cell">'  + fmt(costs.arcyberPortion  || 0) + '</td>' +
-            '<td class="cost-cell muted">' + fmt(costs.itemsFee   || 0) + '</td>' +
-            '<td class="cost-cell muted">' + fmt(costs.gsaFee     || 0) + '</td>' +
-            '<td class="total-cell">' + fmt(costs.totalCurrentCost|| 0) + '</td>' +
-            '<td class="cost-cell">'  + fmt(costs.projectedNextFY || 0) + '</td>'
-          : '';
+      var fy = bmdFYSetup();
+      if (!isSU) document.getElementById('bmdRoleNote').textContent = ' Dollar amounts visible to superusers only.';
+
+      // Build thead
+      document.getElementById('bmdThead').innerHTML = '<tr>' +
+        '<th>Delivery Order Name</th>' +
+        '<th>DO #</th>' +
+        '<th>PoP Begin</th>' +
+        '<th>PoP End</th>' +
+        fy.monthCols.map(function(m) { return '<th class="text-right" style="min-width:62px;white-space:nowrap">' + m + '</th>'; }).join('') +
+        '<th class="text-right" style="min-width:90px">Total $</th>' +
+      '</tr>';
+
+      var filtered = contracts.filter(function(c) { return c.deliveryOrderName && c.deliveryOrderName !== 'Test_Contract'; });
+      var colTotals = new Array(24).fill(0);
+      var grandTotal = 0;
+
+      var rowsHtml = filtered.map(function(c) {
+        var cells = new Array(24).fill(null);
+        var rowTotal = 0;
+
+        if (c.popBeginDate) {
+          var trigger = new Date(c.popBeginDate + 'T12:00:00');
+          trigger.setDate(trigger.getDate() - 45);
+          var tYear = trigger.getFullYear(), tMon = trigger.getMonth();
+          var inFY = (tYear === fy.fyYear - 1 && tMon >= 9) || (tYear === fy.fyYear && tMon <= 8);
+          if (inFY) {
+            var fyIdx = fy.calToFY[tMon];
+            var half  = trigger.getDate() <= 15 ? 0 : 1;
+            var ci    = fyIdx * 2 + half;
+            var amt   = cost(c);
+            cells[ci] = amt;
+            rowTotal  = amt;
+            colTotals[ci] += amt;
+            grandTotal    += amt;
+          }
+        }
+
         return '<tr>' +
-          '<td class="row-num">' + (idx + 1) + '</td>' +
           '<td><strong>' + c.deliveryOrderName + '</strong></td>' +
           '<td class="muted">' + (c.deliveryOrderNumber || '—') + '</td>' +
-          '<td>' + porFundHtml + '</td>' +
-          costCells +
-          '<td class="muted">' + UTILS.formatDate(c.popEndDate) + '</td>' +
+          '<td class="muted">' + UTILS.formatDate(c.popBeginDate) + '</td>' +
+          '<td class="muted">' + UTILS.formatDate(c.popEndDate)   + '</td>' +
+          cells.map(function(v) {
+            if (v === null) return '<td></td>';
+            return isSU ? '<td class="cost-cell">' + fmt(v) + '</td>' : '<td class="cost-cell muted" style="color:var(--text-muted)">—</td>';
+          }).join('') +
+          '<td class="total-cell">' + (rowTotal > 0 ? (isSU ? fmt(rowTotal) : '<span class="text-muted">—</span>') : '') + '</td>' +
         '</tr>';
-      }).join('');
+      });
+
+      // Grand total row
+      var totRow = '<tr style="border-top:2px solid var(--border)">' +
+        '<td colspan="4" style="color:var(--gold);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase">Grand Total</td>' +
+        colTotals.map(function(t) {
+          return t > 0
+            ? (isSU ? '<td class="cost-cell" style="font-weight:700">' + fmt(t) + '</td>' : '<td class="muted">—</td>')
+            : '<td></td>';
+        }).join('') +
+        '<td class="total-cell" style="font-weight:700">' + (isSU ? fmt(grandTotal) : '<span class="text-muted">—</span>') + '</td>' +
+      '</tr>';
+
+      document.getElementById('bmdTbody').innerHTML = rowsHtml.join('') + totRow;
     }
 
     // ── Visualization ────────────────────────────────────────────
@@ -346,8 +408,9 @@
     function buildPieChart(canvasId, labels, values, colors, showMoney) {
       var ctx = document.getElementById(canvasId);
       if (!ctx) return;
+      if (chartInstances[canvasId]) { chartInstances[canvasId].destroy(); delete chartInstances[canvasId]; }
       var total = values.reduce(function(a, b) { return a + b; }, 0);
-      new Chart(ctx.getContext('2d'), {
+      chartInstances[canvasId] = new Chart(ctx.getContext('2d'), {
         type: 'pie',
         data: {
           labels: labels,
@@ -477,8 +540,6 @@
           document.getElementById('tab-' + t).classList.toggle('active', t === name);
           document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === name);
         });
-        // Build charts the first time the Visualization tab is shown so
-        // Chart.js can measure the canvas dimensions correctly.
         if (name === 'viz' && !chartsBuilt) {
           chartsBuilt = true;
           buildMasterChart(allContracts);
@@ -486,9 +547,26 @@
         }
       },
 
+      setPalette: function(name) {
+        PALETTE = (name === 'army') ? ARMY_PALETTE : FULL_PALETTE;
+        document.getElementById('paletteArmyBtn').className = 'btn btn-sm ' + (name === 'army' ? 'btn-gold' : 'btn-outline');
+        document.getElementById('paletteFullBtn').className = 'btn btn-sm ' + (name === 'full' ? 'btn-gold' : 'btn-outline');
+        // Destroy all chart instances and rebuild
+        Object.keys(chartInstances).forEach(function(id) {
+          if (chartInstances[id]) { chartInstances[id].destroy(); }
+        });
+        chartInstances = {};
+        buildMasterChart(allContracts);
+        buildPORCharts(allContracts);
+      },
+
       exportPdm: function() {
         if (typeof XLSX === 'undefined') { alert('Export library not loaded.'); return; }
-        var rows = [['#','Delivery Order Name','DO #','POR(s) Supported','POR Funded By','Vehicle','PoP Begin','PoP End','Primary Metric','Renewal Status','Notes']];
+        var baseHdr = ['#','Delivery Order Name','DO #','POR(s) Supported','POR Funded By','Vehicle','PoP Begin','PoP End'];
+        var costHdr = isSU ? ['BA8 Portion ($)','ARCYBER Portion ($)','ITEMS Fee ($)','GSA Fee ($)','Total Current Cost ($)','Projected Next FY ($)'] : [];
+        var tailHdr = ['Primary Metric','Renewal Status','Notes'];
+        var rows = [baseHdr.concat(costHdr).concat(tailHdr)];
+
         allContracts.forEach(function(c, i) {
           var primaryMetric = '—';
           if (c.lineItems && c.lineItems.length > 0) {
@@ -497,19 +575,11 @@
             if (pli && pli.metricType) primaryMetric = (pli.metricQuantity || pli.quantity || '') + ' ' + pli.metricType;
           }
           var rs = renewalStatusForContract(c);
-          rows.push([
-            i + 1,
-            c.deliveryOrderName,
-            c.deliveryOrderNumber || '',
-            (c.porSupported || []).join('; '),
-            (c.porFundedBy  || []).join('; '),
-            c.vehicle || '',
-            c.popBeginDate || '',
-            c.popEndDate   || '',
-            primaryMetric,
-            rs ? rs.lbl : (c.renewalStatus || ''),
-            c.notes || ''
-          ]);
+          var costs = c.costs || {};
+          var baseRow = [i+1, c.deliveryOrderName, c.deliveryOrderNumber||'', (c.porSupported||[]).join('; '), (c.porFundedBy||[]).join('; '), c.vehicle||'', c.popBeginDate||'', c.popEndDate||''];
+          var costRow = isSU ? [costs.ba8Portion||0, costs.arcyberPortion||0, costs.itemsFee||0, costs.gsaFee||0, costs.totalCurrentCost||0, costs.projectedNextFY||0] : [];
+          var tailRow = [primaryMetric, rs ? rs.lbl : (c.renewalStatus||''), c.notes||''];
+          rows.push(baseRow.concat(costRow).concat(tailRow));
         });
         var ws = XLSX.utils.aoa_to_sheet(rows);
         ws['!cols'] = rows[0].map(function(h) { return { wch: Math.max(String(h).length + 4, 14) }; });

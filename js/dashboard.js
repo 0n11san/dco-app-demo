@@ -134,6 +134,12 @@ const DASHBOARD = {
       const rs = DASHBOARD._renewalStatus(c);
       row += '<td>' + (rs ? '<span class="status-badge badge-' + rs.cls + '">' + rs.lbl + '</span>' : '—') + '</td>';
 
+      const notesTrunc = c.notes
+        ? '<span data-tooltip="' + c.notes.replace(/"/g, '&quot;') + '" style="cursor:default">' +
+          (c.notes.length > 55 ? c.notes.slice(0, 55) + '…' : c.notes) + '</span>'
+        : '<span class="muted">—</span>';
+      row += '<td class="muted" style="max-width:200px;white-space:normal;font-size:11px">' + notesTrunc + '</td>';
+
       if (isSU) {
         row += '<td onclick="event.stopPropagation()">' +
           '<button class="action-btn" onclick="EDIT.open(\'' + c.id + '\')" title="Edit">&#9998;</button>' +
